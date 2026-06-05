@@ -107,3 +107,16 @@ Install bundled Gley:
 ```powershell
 python cli/unity_sdk_agent.py install-gley --project "<UnityProjectPath>"
 ```
+
+Configure the full Gley notification profile:
+
+```powershell
+python cli/unity_sdk_agent.py configure-gley-notifications --project "<UnityProjectPath>"
+```
+
+This command must be used when the user expects the full production setup. It configures these pieces in addition to copying/installing packages:
+
+- Android define symbol `EnableNotificationsAndroid`
+- `ProjectSettings/NotificationsSettings.asset` with target-project icon GUIDs
+- first enabled build scene prefab placement for `NotificationsManager`
+- validation report for the `gley-remote-config` profile

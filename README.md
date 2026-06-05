@@ -82,6 +82,14 @@ Install the bundled Gley plugin into a Unity project:
 python cli/unity_sdk_agent.py install-gley --project "D:\Path\To\UnityProject"
 ```
 
+Configure the full Gley notification profile:
+
+```powershell
+python cli/unity_sdk_agent.py configure-gley-notifications --project "D:\Path\To\UnityProject"
+```
+
+This command installs/copies Gley if missing, adds the Unity Mobile Notifications package, adds the Android define symbol, writes Mobile Notification icon settings using the target project's actual icon GUIDs, and places the `NotificationsManager` prefab into the first enabled build scene.
+
 <p align="center">
   <img src="docs/assets/terminal-preview.svg" alt="CLI validation preview" width="86%" />
 </p>
@@ -126,7 +134,7 @@ Prompt for Codex or another coding agent:
 ```text
 Use this repo as the Unity SDK Agent Plugin.
 Read codex/SKILL.md first.
-Add mobile notifications to my Unity project.
+Run configure-gley-notifications for mobile notifications in my Unity project.
 Validate after changes and summarize the report.
 ```
 

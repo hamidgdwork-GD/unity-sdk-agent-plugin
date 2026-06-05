@@ -39,3 +39,11 @@ python cli/unity_sdk_agent.py install-gley --project "D:\Path\To\UnityProject"
 ```
 
 By default, this will not overwrite an existing `Assets/GleyPlugins` folder.
+
+Configure the full Gley + Firebase notification profile:
+
+```powershell
+python cli/unity_sdk_agent.py configure-gley-notifications --project "D:\Path\To\UnityProject"
+```
+
+Use this when the project should match the production profile, including Mobile Notification icon settings and startup scene prefab placement.

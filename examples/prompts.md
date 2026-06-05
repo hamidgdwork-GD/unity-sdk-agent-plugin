@@ -3,7 +3,7 @@
 ## Add Mobile Notifications
 
 ```text
-Use the Unity SDK Agent Plugin to add mobile notifications to this Unity project. Read the mobile-notifications recipe first, run the CLI integration, validate it, and summarize changed files and manual steps.
+Use the Unity SDK Agent Plugin to configure mobile notifications in this Unity project. Read the mobile-notifications recipe first, run configure-gley-notifications for the full production profile, validate it, and summarize changed files and manual steps.
 ```
 
 ## Validate Existing Setup

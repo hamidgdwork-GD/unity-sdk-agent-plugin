@@ -38,6 +38,14 @@ python cli/unity_sdk_agent.py add <integration-id> --project "<UnityProjectPath>
 python cli/unity_sdk_agent.py add mobile-notifications --project "D:\Projects\MyUnityGame"
 ```
 
+For the production Gley + Firebase Remote Config profile, prefer:
+
+```powershell
+python cli/unity_sdk_agent.py configure-gley-notifications --project "D:\Projects\MyUnityGame"
+```
+
+This is the full setup command. Do not stop after `install-gley`; that only copies the plugin files.
+
 Validation only:
 
 ```powershell

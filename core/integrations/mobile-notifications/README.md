@@ -14,6 +14,12 @@ Validate a project that uses the Gley + Firebase Remote Config pattern:
 python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remote-config --project "D:\Path\To\UnityProject"
 ```
 
+Configure the full profile:
+
+```powershell
+python cli/unity_sdk_agent.py configure-gley-notifications --project "D:\Path\To\UnityProject"
+```
+
 ## Generated Files
 
 - `Assets/Scripts/Notifications/MobileNotificationService.cs`
