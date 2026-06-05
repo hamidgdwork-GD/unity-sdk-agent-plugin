@@ -1,0 +1,55 @@
+<svg width="1100" height="460" viewBox="0 0 1100 460" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Unity SDK Agent Plugin architecture</title>
+  <desc id="desc">Flow from developer request to AI agent, recipe, CLI tools, Unity project changes, validation, and report.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0B1F28" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+  <rect width="1100" height="460" rx="20" fill="#F6FBF8"/>
+  <g filter="url(#shadow)">
+    <rect x="54" y="64" width="180" height="92" rx="14" fill="#0B5C6B"/>
+    <text x="144" y="104" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">Developer</text>
+    <text x="144" y="130" text-anchor="middle" fill="#D7F6EA" font-family="Segoe UI, Arial, sans-serif" font-size="14">natural request</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="314" y="64" width="190" height="92" rx="14" fill="#1F8A70"/>
+    <text x="409" y="103" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">AI Agent</text>
+    <text x="409" y="130" text-anchor="middle" fill="#E7F7ED" font-family="Segoe UI, Arial, sans-serif" font-size="14">Codex / Claude / etc.</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="584" y="64" width="190" height="92" rx="14" fill="#2F4858"/>
+    <text x="679" y="103" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">Recipe</text>
+    <text x="679" y="130" text-anchor="middle" fill="#D7F6EA" font-family="Segoe UI, Arial, sans-serif" font-size="14">exact integration steps</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="850" y="64" width="196" height="92" rx="14" fill="#0B5C6B"/>
+    <text x="948" y="103" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="700">CLI Tools</text>
+    <text x="948" y="130" text-anchor="middle" fill="#D7F6EA" font-family="Segoe UI, Arial, sans-serif" font-size="14">patch and generate</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="190" y="278" width="220" height="98" rx="14" fill="#FFFFFF"/>
+    <text x="300" y="318" text-anchor="middle" fill="#0B5C6B" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="800">Unity Project</text>
+    <text x="300" y="346" text-anchor="middle" fill="#2F4858" font-family="Segoe UI, Arial, sans-serif" font-size="14">packages, scripts, settings</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="466" y="278" width="220" height="98" rx="14" fill="#FFFFFF"/>
+    <text x="576" y="318" text-anchor="middle" fill="#0B5C6B" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="800">Validator</text>
+    <text x="576" y="346" text-anchor="middle" fill="#2F4858" font-family="Segoe UI, Arial, sans-serif" font-size="14">checks real setup</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="742" y="278" width="220" height="98" rx="14" fill="#FFFFFF"/>
+    <text x="852" y="318" text-anchor="middle" fill="#0B5C6B" font-family="Segoe UI, Arial, sans-serif" font-size="20" font-weight="800">Report</text>
+    <text x="852" y="346" text-anchor="middle" fill="#2F4858" font-family="Segoe UI, Arial, sans-serif" font-size="14">changed files and manual steps</text>
+  </g>
+  <path d="M234 110H314" stroke="#1F8A70" stroke-width="5" stroke-linecap="round"/>
+  <path d="M504 110H584" stroke="#1F8A70" stroke-width="5" stroke-linecap="round"/>
+  <path d="M774 110H850" stroke="#1F8A70" stroke-width="5" stroke-linecap="round"/>
+  <path d="M948 156V220C948 246 926 268 900 268H300C274 268 252 290 252 316" stroke="#1F8A70" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M410 327H466" stroke="#1F8A70" stroke-width="5" stroke-linecap="round"/>
+  <path d="M686 327H742" stroke="#1F8A70" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="270" cy="110" r="6" fill="#1F8A70"/>
+  <circle cx="544" cy="110" r="6" fill="#1F8A70"/>
+  <circle cx="812" cy="110" r="6" fill="#1F8A70"/>
+</svg>
+

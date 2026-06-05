@@ -1,0 +1,31 @@
+<svg width="1280" height="360" viewBox="0 0 1280 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Unity SDK Agent Plugin</title>
+  <desc id="desc">A GitHub banner for an agent-ready Unity SDK integration plugin.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#082A3A"/>
+      <stop offset="0.48" stop-color="#0B5C6B"/>
+      <stop offset="1" stop-color="#1F8A70"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#F8FCFA" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#D7F6EA" stop-opacity="0.88"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="360" rx="0" fill="url(#bg)"/>
+  <path d="M0 279C137 238 250 313 374 268C502 221 591 109 745 144C884 175 948 298 1088 279C1175 267 1233 209 1280 178V360H0V279Z" fill="#E7F7ED" opacity="0.14"/>
+  <path d="M82 74H250L334 180L250 286H82L166 180L82 74Z" fill="#E7F7ED" opacity="0.16"/>
+  <path d="M121 114H230L285 180L230 246H121L176 180L121 114Z" fill="#E7F7ED" opacity="0.26"/>
+  <rect x="772" y="70" width="386" height="220" rx="18" fill="url(#panel)"/>
+  <rect x="801" y="102" width="328" height="18" rx="9" fill="#0B5C6B" opacity="0.9"/>
+  <rect x="801" y="143" width="132" height="18" rx="9" fill="#1F8A70"/>
+  <rect x="953" y="143" width="176" height="18" rx="9" fill="#2F4858" opacity="0.28"/>
+  <rect x="801" y="184" width="254" height="18" rx="9" fill="#2F4858" opacity="0.28"/>
+  <rect x="801" y="225" width="210" height="18" rx="9" fill="#1F8A70" opacity="0.86"/>
+  <circle cx="1099" cy="234" r="42" fill="#0B5C6B"/>
+  <path d="M1085 235L1095 245L1116 220" stroke="#E7F7ED" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="370" y="145" fill="#F8FCFA" font-family="Segoe UI, Arial, sans-serif" font-size="54" font-weight="800">Unity SDK Agent Plugin</text>
+  <text x="372" y="198" fill="#D7F6EA" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="500">Agent-ready recipes, templates, and validators for Unity SDK integrations.</text>
+  <text x="372" y="245" fill="#F8FCFA" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700">Codex  |  Claude  |  Antigravity  |  CLI</text>
+</svg>
+
