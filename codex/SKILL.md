@@ -7,6 +7,8 @@ Use this skill when a user asks to add, validate, or explain Unity SDK integrati
 - Always inspect the Unity project before modifying files.
 - Prefer the CLI tool in `cli/unity_sdk_agent.py` for supported integrations.
 - Do not invent SDK steps when a recipe exists.
+- Do not copy paid third-party Asset Store packages into this repository or into public deliverables.
+- If Gley is required, validate that the target Unity project already contains a licensed local copy.
 - Read the selected recipe before running an integration.
 - Validate after applying an integration.
 - Report changed files, validation status, and manual steps.

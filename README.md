@@ -172,6 +172,7 @@ This repo does **not** claim zero-mistake automation across all Unity projects y
 | [Gley + Firebase Profile](core/integrations/mobile-notifications/implementation-profile-gley-remote-config.md) | Production implementation profile |
 | [Roadmap](docs/roadmap.md) | Planned SDK packs and tooling |
 | [Contributing](docs/contributing.md) | How to add new integration packs |
+| [Third-Party Assets](docs/third-party-assets.md) | How licensed assets like Gley should be handled |
 | [Example Prompts](examples/prompts.md) | Copy-paste prompts for agents |
 
 ## Planned SDK Packs
