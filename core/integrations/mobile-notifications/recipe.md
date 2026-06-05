@@ -66,7 +66,8 @@ When the project uses Gley notifications and Firebase Remote Config, the agent m
 - Test notifications on a real Android device.
 - Android 13+ may require runtime notification permission behavior depending on Unity package handling and OS version.
 - This recipe provides local notifications, not remote push notifications from a server.
-- The Gley package itself is a third-party Asset Store dependency. Do not copy or redistribute the paid Gley package from another project unless the license allows it.
+- This repo includes an owner-approved vendored Gley copy under `vendor/gley-mobile-push-notifications/Assets/GleyPlugins`.
+- If Gley is missing, copy the vendored `Assets/GleyPlugins` folder into the target project only after confirming the user wants the bundled plugin installed.
 - Firebase dashboard values must be configured manually or through a separate Firebase admin workflow.
 
 ## Validation
@@ -99,4 +100,10 @@ Validate the Gley + Firebase Remote Config profile:
 
 ```powershell
 python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remote-config --project "<UnityProjectPath>"
+```
+
+Install bundled Gley:
+
+```powershell
+python cli/unity_sdk_agent.py install-gley --project "<UnityProjectPath>"
 ```

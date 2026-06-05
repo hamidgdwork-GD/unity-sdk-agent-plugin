@@ -31,3 +31,11 @@ python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remot
 ```
 
 Use `--no-report` when you want validation output without writing `IntegrationAgentReports/` into the Unity project.
+
+Install the bundled Gley plugin into a Unity project:
+
+```powershell
+python cli/unity_sdk_agent.py install-gley --project "D:\Path\To\UnityProject"
+```
+
+By default, this will not overwrite an existing `Assets/GleyPlugins` folder.

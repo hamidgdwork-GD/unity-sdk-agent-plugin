@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MOBILE_NOTIFICATIONS_PACKAGE = "com.unity.mobile.notifications"
 MOBILE_NOTIFICATIONS_VERSION = "2.4.3"
+VENDORED_GLEY_PATH = ROOT / "vendor" / "gley-mobile-push-notifications" / "Assets" / "GleyPlugins"
 
 
 class AgentError(Exception):
@@ -62,6 +63,32 @@ def copy_template(relative_template: str, project: Path, relative_target: str) -
 
     shutil.copyfile(source, target)
     return True
+
+
+def install_vendored_gley(project: Path, force: bool = False) -> dict:
+    if not is_unity_project(project):
+        raise AgentError(f"Not a Unity project: {project}")
+
+    if not VENDORED_GLEY_PATH.exists():
+        raise AgentError(f"Vendored Gley plugin is missing: {VENDORED_GLEY_PATH}")
+
+    target = project / "Assets" / "GleyPlugins"
+    if target.exists() and not force:
+        return {
+            "changed_files": [],
+            "installed": False,
+            "message": "Assets/GleyPlugins already exists. Use --force to overwrite it."
+        }
+
+    if target.exists() and force:
+        shutil.rmtree(target)
+
+    shutil.copytree(VENDORED_GLEY_PATH, target)
+    return {
+        "changed_files": ["Assets/GleyPlugins"],
+        "installed": True,
+        "message": "Vendored Gley plugin copied to Assets/GleyPlugins."
+    }
 
 
 def file_contains(path: Path, needles: list[str]) -> bool:
@@ -254,10 +281,19 @@ def main() -> int:
     validate_parser.add_argument("--profile", choices=["basic", "gley-remote-config"], default="basic")
     validate_parser.add_argument("--no-report", action="store_true", help="Do not write IntegrationAgentReports output")
 
+    gley_parser = subparsers.add_parser("install-gley", help="Install the vendored Gley plugin into a Unity project")
+    gley_parser.add_argument("--project", required=True, help="Path to a Unity project")
+    gley_parser.add_argument("--force", action="store_true", help="Overwrite existing Assets/GleyPlugins")
+
     args = parser.parse_args()
     project = Path(args.project).expanduser().resolve()
 
     try:
+        if args.command == "install-gley":
+            result = install_vendored_gley(project, args.force)
+            print_result(result)
+            return 0
+
         if args.command == "add":
             result = add_mobile_notifications(project, args.profile, not args.no_report)
         else:

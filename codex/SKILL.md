@@ -7,8 +7,8 @@ Use this skill when a user asks to add, validate, or explain Unity SDK integrati
 - Always inspect the Unity project before modifying files.
 - Prefer the CLI tool in `cli/unity_sdk_agent.py` for supported integrations.
 - Do not invent SDK steps when a recipe exists.
-- Do not copy paid third-party Asset Store packages into this repository or into public deliverables.
-- If Gley is required, validate that the target Unity project already contains a licensed local copy.
+- Gley Mobile Push Notifications is vendored under `vendor/gley-mobile-push-notifications` with owner approval.
+- If Gley is required and missing from the target project, ask before copying the vendored `Assets/GleyPlugins` folder into the target Unity project's `Assets/` folder.
 - Read the selected recipe before running an integration.
 - Validate after applying an integration.
 - Report changed files, validation status, and manual steps.
@@ -51,3 +51,11 @@ python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remot
 ```
 
 Use `--no-report` if the user asks to inspect without modifying the project.
+
+Install bundled Gley plugin:
+
+```powershell
+python cli/unity_sdk_agent.py install-gley --project "D:\Projects\MyUnityGame"
+```
+
+Do not use `--force` unless the user explicitly approves overwriting an existing `Assets/GleyPlugins` folder.

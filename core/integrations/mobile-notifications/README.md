@@ -43,4 +43,4 @@ Tools > Integration Agent > Mobile Notifications > Cancel All Notifications
 
 - This is local notification support, not remote server push.
 - Android device testing is required.
-- The Gley Asset Store package is not bundled in this repo. The recipe validates and wires projects that already include it.
+- The Gley plugin is bundled under `vendor/gley-mobile-push-notifications/Assets/GleyPlugins` with owner approval.

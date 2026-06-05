@@ -76,6 +76,12 @@ Validate an existing Gley + Firebase Remote Config setup:
 python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remote-config --no-report --project "D:\Path\To\UnityProject"
 ```
 
+Install the bundled Gley plugin into a Unity project:
+
+```powershell
+python cli/unity_sdk_agent.py install-gley --project "D:\Path\To\UnityProject"
+```
+
 <p align="center">
   <img src="docs/assets/terminal-preview.svg" alt="CLI validation preview" width="86%" />
 </p>
@@ -98,6 +104,12 @@ The production profile checks:
 - Firebase Remote Config keys `isNotificationActive` and `notificationHours`
 - Notification icons `commonicon` and `smallicon`
 - Permission, init, focus, and scheduling lifecycle
+
+Bundled Gley path:
+
+```text
+vendor/gley-mobile-push-notifications/Assets/GleyPlugins
+```
 
 ## Agent Support
 
@@ -187,7 +199,7 @@ This repo does **not** claim zero-mistake automation across all Unity projects y
 
 ## Important Notes
 
-- Paid third-party SDKs such as Gley are not bundled in this repo.
+- Gley Mobile Push Notifications is vendored under `vendor/` with owner approval; verify ownership before redistributing.
 - Firebase dashboard values must still be configured in Firebase.
 - Mobile notification behavior must be tested on a real Android device.
 - Recipes should be validated against real projects before being treated as production-ready.
