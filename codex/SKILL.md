@@ -2,6 +2,8 @@
 
 Use this skill when a user asks to add, validate, or explain Unity SDK integrations.
 
+Read the root `AGENTS.md` first. It contains the canonical workflow for mobile notifications.
+
 ## Rules
 
 - Always inspect the Unity project before modifying files.
@@ -23,28 +25,23 @@ Use this skill when a user asks to add, validate, or explain Unity SDK integrati
 
 1. Confirm the target path is a Unity project.
 2. Read `core/integrations/<integration-id>/recipe.md`.
-3. Run:
+3. For `mobile-notifications`, run the production configurator:
 
 ```powershell
-python cli/unity_sdk_agent.py add <integration-id> --project "<UnityProjectPath>"
+python cli/unity_sdk_agent.py configure-gley-notifications --project "<UnityProjectPath>"
 ```
 
-4. If the add command succeeds, summarize the generated report.
-5. If it fails, inspect the report and only fix issues related to the integration.
+4. Run Unity's editor configurator using batchmode if possible, or report the menu action as pending.
+5. Validate with `--profile gley-remote-config --no-report`.
+6. If validation fails, inspect the failed checks and only fix issues related to the integration.
 
 ## Mobile Notifications Example
-
-```powershell
-python cli/unity_sdk_agent.py add mobile-notifications --project "D:\Projects\MyUnityGame"
-```
-
-For the production Gley + Firebase Remote Config profile, prefer:
 
 ```powershell
 python cli/unity_sdk_agent.py configure-gley-notifications --project "D:\Projects\MyUnityGame"
 ```
 
-This is the full setup command. Do not stop after `install-gley`; that only copies the plugin files.
+This is the full setup command. Do not use `add mobile-notifications` for production Gley/Firebase projects. Do not stop after `install-gley`; that only copies the plugin files.
 
 After running `configure-gley-notifications`, the target Unity project contains:
 

@@ -131,19 +131,19 @@ vendor/gley-mobile-push-notifications/Assets/GleyPlugins
 
 | Agent/App | Entry Point | Status |
 | --- | --- | --- |
+| Generic agents | `AGENTS.md` | Ready |
 | Codex | `codex/SKILL.md` | Ready |
-| Claude | `claude/CLAUDE.md` | Ready |
-| Antigravity | `antigravity/instructions.md` | Ready |
+| Claude | `CLAUDE.md` and `claude/CLAUDE.md` | Ready |
+| Antigravity | `ANTIGRAVITY.md` and `antigravity/instructions.md` | Ready |
 | Any terminal agent | `cli/unity_sdk_agent.py` | Ready |
 | MCP-compatible apps | `mcp/README.md` | Planned |
 
-Prompt for Codex or another coding agent:
+Minimal prompt for Codex, Claude, Antigravity, or another coding agent:
 
 ```text
 Use this repo as the Unity SDK Agent Plugin.
-Read codex/SKILL.md first.
-Run configure-gley-notifications for mobile notifications in my Unity project.
-Validate after changes and summarize the report.
+Read AGENTS.md first.
+Add/fix mobile notifications in my Unity project: <UnityProjectPath>
 ```
 
 Prompt for an existing Gley + Firebase setup:

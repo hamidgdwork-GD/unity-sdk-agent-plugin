@@ -1,16 +1,23 @@
 # Antigravity Instructions
 
-Use this repository as a Unity SDK integration plugin.
+Read the root `AGENTS.md` first.
 
-Workflow:
+For Unity mobile notifications, use the full production workflow:
 
-1. Read `codex/SKILL.md`.
-2. Read the selected integration recipe under `core/integrations/`.
-3. Run the CLI command from this repository against the target Unity project.
-4. Validate the integration.
-5. Summarize changed files, warnings, and manual steps.
+```powershell
+python cli/unity_sdk_agent.py configure-gley-notifications --project "<UnityProjectPath>"
+```
 
-Supported integration:
+Then run the Unity-side configurator if possible:
 
-- `mobile-notifications`
+```text
+IntegrationAgent.Editor.GleyNotificationUnityConfigurator.ConfigureForBatchmode
+```
 
+Then validate:
+
+```powershell
+python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remote-config --no-report --project "<UnityProjectPath>"
+```
+
+Do not stop after `install-gley` or `add mobile-notifications`.

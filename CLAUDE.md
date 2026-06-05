@@ -1,14 +1,16 @@
-# Unity SDK Agent Plugin
+# Claude Instructions
 
-Read the root `AGENTS.md` first.
+Read `AGENTS.md` first.
 
-For Unity mobile notifications, use the full production workflow:
+For Unity mobile notifications, always use the production workflow in `AGENTS.md`. Do not stop after package install or Gley copy.
+
+Required command:
 
 ```powershell
 python cli/unity_sdk_agent.py configure-gley-notifications --project "<UnityProjectPath>"
 ```
 
-Then run the Unity-side configurator if possible:
+Then run Unity's editor configurator if possible:
 
 ```text
 IntegrationAgent.Editor.GleyNotificationUnityConfigurator.ConfigureForBatchmode
@@ -20,4 +22,3 @@ Then validate:
 python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remote-config --no-report --project "<UnityProjectPath>"
 ```
 
-Do not stop after `install-gley` or `add mobile-notifications`.

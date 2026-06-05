@@ -7,7 +7,9 @@ Open a Unity project in Codex and provide the plugin path or repo link.
 Prompt:
 
 ```text
-Use the Unity SDK Agent Plugin. Read codex/SKILL.md and add mobile notifications to this Unity project. Validate after changes and summarize the report.
+Use this repo as the Unity SDK Agent Plugin.
+Read AGENTS.md first.
+Add/fix mobile notifications in this Unity project.
 ```
 
 ## With Claude Or Antigravity
@@ -15,7 +17,9 @@ Use the Unity SDK Agent Plugin. Read codex/SKILL.md and add mobile notifications
 Use the same prompt, but point the agent at this repository.
 
 ```text
-Use this repository as the Unity SDK Agent Plugin. Add mobile notifications to my Unity project using the mobile-notifications recipe.
+Use this repository as the Unity SDK Agent Plugin.
+Read AGENTS.md first.
+Add/fix mobile notifications in my Unity project: D:\Path\To\UnityProject
 ```
 
 ## Direct CLI
@@ -48,7 +52,7 @@ python cli/unity_sdk_agent.py configure-gley-notifications --project "D:\Path\To
 
 Use this when the project should match the production profile, including Mobile Notification icon settings and startup scene prefab placement.
 
-After opening Unity, run:
+The agent instructions require the Unity-side settings step. If the agent cannot run Unity batchmode, open Unity and run:
 
 ```text
 Tools > Integration Agent > Mobile Notifications > Configure Gley Notification Settings

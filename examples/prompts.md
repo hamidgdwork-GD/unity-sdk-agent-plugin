@@ -3,7 +3,17 @@
 ## Add Mobile Notifications
 
 ```text
-Use the Unity SDK Agent Plugin to configure mobile notifications in this Unity project. Read the mobile-notifications recipe first, run configure-gley-notifications for the full production profile, validate it, and summarize changed files and manual steps.
+Use this repo as the Unity SDK Agent Plugin.
+Read AGENTS.md first.
+Add/fix mobile notifications in this Unity project.
+```
+
+## Add Mobile Notifications With Path
+
+```text
+Use this repo as the Unity SDK Agent Plugin.
+Read AGENTS.md first.
+Add/fix mobile notifications in my Unity project: D:\Path\To\UnityProject
 ```
 
 ## Validate Existing Setup
@@ -15,7 +25,9 @@ Use the Unity SDK Agent Plugin to validate mobile notifications in this Unity pr
 ## Validate Gley + Firebase Remote Config Setup
 
 ```text
-Use the Unity SDK Agent Plugin to validate the mobile notifications setup with the gley-remote-config profile. Do not modify the project; use --no-report if running the CLI. Confirm Unity Mobile Notifications, Gley scripts, Android define symbols, notification icons, Firebase Remote Config keys, and splash-scene NotificationsManager placement.
+Use this repo as the Unity SDK Agent Plugin.
+Read AGENTS.md first.
+Validate mobile notifications in this Unity project without modifying files.
 ```
 
 ## Explain The Integration
