@@ -11,6 +11,7 @@ This repo is designed to be installed once as a reusable agent plugin/toolkit. T
 - Generated C# service wrapper
 - Generated Unity Editor test menu
 - Validation report
+- Production validation profile for Gley + Firebase Remote Config notification setups
 
 ## Quick Use
 
@@ -24,6 +25,12 @@ Validate only:
 
 ```powershell
 python cli/unity_sdk_agent.py validate mobile-notifications --project "D:\Path\To\UnityProject"
+```
+
+Validate a Gley + Firebase Remote Config production setup:
+
+```powershell
+python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remote-config --project "D:\Path\To\UnityProject"
 ```
 
 ## Use With Codex Or Other Agents
@@ -59,6 +66,11 @@ mcp/
 
 This is version 0.1. It focuses on proving the plugin system with one integration. Future SDK packs can be added under `core/integrations/`.
 
+The mobile notifications recipe now includes two profiles:
+
+- `basic`: direct Unity Mobile Notifications wrapper.
+- `gley-remote-config`: validates a real production-style setup using Gley Mobile Push Notifications, Firebase Remote Config, Android define symbols, splash-scene manager placement, and notification icon settings.
+
 ## Suggested Agent Prompt
 
 ```text
@@ -67,4 +79,3 @@ Read codex/SKILL.md first.
 Add mobile notifications to my Unity project.
 Validate after changes and summarize the report.
 ```
-

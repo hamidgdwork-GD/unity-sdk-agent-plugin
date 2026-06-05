@@ -24,3 +24,10 @@ Use this repository as the Unity SDK Agent Plugin. Add mobile notifications to m
 python cli/unity_sdk_agent.py add mobile-notifications --project "D:\Path\To\UnityProject"
 ```
 
+For projects that already use Gley Mobile Push Notifications plus Firebase Remote Config:
+
+```powershell
+python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remote-config --project "D:\Path\To\UnityProject"
+```
+
+Use `--no-report` when you want validation output without writing `IntegrationAgentReports/` into the Unity project.

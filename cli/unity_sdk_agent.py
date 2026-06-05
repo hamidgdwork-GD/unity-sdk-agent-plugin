@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MOBILE_NOTIFICATIONS_PACKAGE = "com.unity.mobile.notifications"
-MOBILE_NOTIFICATIONS_VERSION = "2.3.2"
+MOBILE_NOTIFICATIONS_VERSION = "2.4.3"
 
 
 class AgentError(Exception):
@@ -64,7 +64,15 @@ def copy_template(relative_template: str, project: Path, relative_target: str) -
     return True
 
 
-def validate_mobile_notifications(project: Path) -> dict:
+def file_contains(path: Path, needles: list[str]) -> bool:
+    if not path.exists():
+        return False
+
+    content = path.read_text(encoding="utf-8", errors="ignore")
+    return all(needle in content for needle in needles)
+
+
+def validate_mobile_notifications(project: Path, profile: str = "basic") -> dict:
     checks = []
 
     checks.append({
@@ -90,26 +98,95 @@ def validate_mobile_notifications(project: Path) -> dict:
         )
     })
 
-    generated_files = [
-        "Assets/Scripts/Notifications/MobileNotificationService.cs",
-        "Assets/Editor/IntegrationAgent/MobileNotificationTestMenu.cs",
-    ]
+    if profile == "basic":
+        generated_files = [
+            "Assets/Scripts/Notifications/MobileNotificationService.cs",
+            "Assets/Editor/IntegrationAgent/MobileNotificationTestMenu.cs",
+        ]
 
-    for relative_path in generated_files:
-        checks.append({
-            "id": relative_path.replace("/", "_").replace(".", "_"),
-            "passed": (project / relative_path).exists(),
-            "message": f"{relative_path} exists."
-        })
+        for relative_path in generated_files:
+            checks.append({
+                "id": relative_path.replace("/", "_").replace(".", "_"),
+                "passed": (project / relative_path).exists(),
+                "message": f"{relative_path} exists."
+            })
+
+    if profile == "gley-remote-config":
+        project_settings = project / "ProjectSettings" / "ProjectSettings.asset"
+        notification_settings = project / "ProjectSettings" / "NotificationsSettings.asset"
+        firebase_script = project / "Assets" / "Scripts" / "firebasecall.cs"
+        gley_facade = project / "Assets" / "GleyPlugins" / "Notifications" / "Scripts" / "GleyNotifications.cs"
+        gley_runtime = project / "Assets" / "GleyPlugins" / "Notifications" / "Scripts" / "NotificationManager.cs"
+        gley_manager = project / "Assets" / "GleyPlugins" / "Implementation" / "NotificationsManager.cs"
+        gley_prefab = project / "Assets" / "GleyPlugins" / "Implementation" / "NotificationsManager.prefab"
+        gley_settings = project / "Assets" / "GleyPlugins" / "Notifications" / "Resources" / "NotificationSettingsData.asset"
+        splash_scene = project / "Assets" / "CodeArchitecture" / "Scenes" / "SplashScene.unity"
+
+        profile_checks = [
+            (
+                "android_define_symbol",
+                file_contains(project_settings, ["EnableNotificationsAndroid"]),
+                "ProjectSettings.asset contains Android define symbol EnableNotificationsAndroid."
+            ),
+            (
+                "notification_icons",
+                file_contains(notification_settings, ["commonicon", "smallicon"]),
+                "NotificationsSettings.asset contains commonicon and smallicon drawable resources."
+            ),
+            (
+                "gley_facade",
+                gley_facade.exists(),
+                "GleyNotifications facade exists."
+            ),
+            (
+                "gley_runtime_manager",
+                file_contains(gley_runtime, ["EnableNotificationsAndroid", "AndroidNotificationCenter", "SendNotificationWithExplicitID"]),
+                "Gley runtime NotificationManager uses Unity Mobile Notifications behind EnableNotificationsAndroid."
+            ),
+            (
+                "game_notifications_manager",
+                file_contains(gley_manager, ["isNotificationActive", "notificationHours", "ReqNotifyStatus", "OnApplicationFocus", "GleyNotifications.SendNotificationOnId"]),
+                "Project NotificationsManager contains remote-config flags, permission gate, focus lifecycle, and Gley scheduling."
+            ),
+            (
+                "notifications_prefab",
+                file_contains(gley_prefab, ["m_Name: NotificationsManager", "commonicon", "smallicon", "OpenFromNotification_NewDay"]),
+                "NotificationsManager prefab exists with serialized icon IDs and New Day notification data."
+            ),
+            (
+                "gley_settings_android",
+                file_contains(gley_settings, ["useForAndroid: 1"]),
+                "Gley NotificationSettingsData is enabled for Android."
+            ),
+            (
+                "firebase_remote_config_hook",
+                file_contains(firebase_script, ["Firebase.RemoteConfig", "isNotificationActive", "notificationHours", "NotificationsManager.Instance.Init()"]),
+                "Firebase Remote Config hook sets notification active/hour values and initializes NotificationsManager."
+            ),
+            (
+                "splash_scene_manager",
+                file_contains(splash_scene, ["NotificationsManager"]),
+                "SplashScene contains a NotificationsManager object or prefab instance."
+            ),
+        ]
+
+        for check_id, passed, message in profile_checks:
+            checks.append({
+                "id": check_id,
+                "passed": passed,
+                "message": message
+            })
 
     return {
         "integration": "mobile-notifications",
+        "profile": profile,
         "valid": all(check["passed"] for check in checks),
         "checks": checks,
         "manual_steps": [
             "Open the project in Unity so Package Manager can resolve the package.",
             "Test notification scheduling on a real Android device.",
-            "This integration adds local notifications, not remote push notifications."
+            "This integration adds local notifications, not remote push notifications.",
+            "For the gley-remote-config profile, configure Firebase Remote Config keys: isNotificationActive and notificationHours."
         ]
     }
 
@@ -129,7 +206,7 @@ def write_report(project: Path, action: str, changed_files: list[str], validatio
     return report_path
 
 
-def add_mobile_notifications(project: Path) -> dict:
+def add_mobile_notifications(project: Path, profile: str = "basic", write_report_file: bool = True) -> dict:
     if not is_unity_project(project):
         raise AgentError(f"Not a Unity project: {project}")
 
@@ -147,13 +224,13 @@ def add_mobile_notifications(project: Path) -> dict:
         if copy_template(template_name, project, target):
             changed_files.append(target)
 
-    validation = validate_mobile_notifications(project)
-    report_path = write_report(project, "add", changed_files, validation)
+    validation = validate_mobile_notifications(project, profile)
+    report_path = write_report(project, "add", changed_files, validation) if write_report_file else None
 
     return {
         "changed_files": changed_files,
         "validation": validation,
-        "report_path": str(report_path),
+        "report_path": str(report_path) if report_path else None,
     }
 
 
@@ -168,21 +245,25 @@ def main() -> int:
     add_parser = subparsers.add_parser("add", help="Add a Unity SDK integration")
     add_parser.add_argument("integration", choices=["mobile-notifications"])
     add_parser.add_argument("--project", required=True, help="Path to a Unity project")
+    add_parser.add_argument("--profile", choices=["basic", "gley-remote-config"], default="basic")
+    add_parser.add_argument("--no-report", action="store_true", help="Do not write IntegrationAgentReports output")
 
     validate_parser = subparsers.add_parser("validate", help="Validate a Unity SDK integration")
     validate_parser.add_argument("integration", choices=["mobile-notifications"])
     validate_parser.add_argument("--project", required=True, help="Path to a Unity project")
+    validate_parser.add_argument("--profile", choices=["basic", "gley-remote-config"], default="basic")
+    validate_parser.add_argument("--no-report", action="store_true", help="Do not write IntegrationAgentReports output")
 
     args = parser.parse_args()
     project = Path(args.project).expanduser().resolve()
 
     try:
         if args.command == "add":
-            result = add_mobile_notifications(project)
+            result = add_mobile_notifications(project, args.profile, not args.no_report)
         else:
-            validation = validate_mobile_notifications(project)
-            report_path = write_report(project, "validate", [], validation)
-            result = {"validation": validation, "report_path": str(report_path)}
+            validation = validate_mobile_notifications(project, args.profile)
+            report_path = write_report(project, "validate", [], validation) if not args.no_report else None
+            result = {"validation": validation, "report_path": str(report_path) if report_path else None}
 
         print_result(result)
         return 0 if result["validation"].get("valid", False) else 2

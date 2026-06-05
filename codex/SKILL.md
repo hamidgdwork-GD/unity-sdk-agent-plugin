@@ -15,6 +15,7 @@ Use this skill when a user asks to add, validate, or explain Unity SDK integrati
 ## Supported Integrations
 
 - `mobile-notifications`: Adds Unity's official Mobile Notifications package, generates a service wrapper, generates an editor test menu, and validates the setup.
+- `mobile-notifications --profile gley-remote-config`: Validates a Gley Mobile Push Notifications + Firebase Remote Config production setup.
 
 ## Standard Flow
 
@@ -41,3 +42,10 @@ Validation only:
 python cli/unity_sdk_agent.py validate mobile-notifications --project "D:\Projects\MyUnityGame"
 ```
 
+Gley + Firebase Remote Config validation:
+
+```powershell
+python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remote-config --project "D:\Projects\MyUnityGame"
+```
+
+Use `--no-report` if the user asks to inspect without modifying the project.

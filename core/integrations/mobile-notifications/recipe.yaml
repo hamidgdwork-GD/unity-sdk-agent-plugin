@@ -3,9 +3,35 @@ name: Mobile Notifications
 provider: unity_mobile_notifications
 unity_package:
   name: com.unity.mobile.notifications
-  version: 2.3.2
+  version: 2.4.3
 targets:
   - unity_android
+profiles:
+  basic:
+    description: Direct Unity Mobile Notifications wrapper.
+  gley-remote-config:
+    description: Gley facade plus Firebase Remote Config activation pattern.
+    required_paths:
+      - Assets/GleyPlugins/Notifications/Scripts/GleyNotifications.cs
+      - Assets/GleyPlugins/Notifications/Scripts/NotificationManager.cs
+      - Assets/GleyPlugins/Implementation/NotificationsManager.cs
+      - Assets/GleyPlugins/Implementation/NotificationsManager.prefab
+      - Assets/GleyPlugins/Notifications/Resources/NotificationSettingsData.asset
+      - Assets/Scripts/firebasecall.cs
+      - Assets/CodeArchitecture/Scenes/SplashScene.unity
+    required_define_symbols:
+      Android:
+        - EnableNotificationsAndroid
+    remote_config_keys:
+      - name: isNotificationActive
+        type: bool
+        default: true
+      - name: notificationHours
+        type: long
+        default: 24
+    notification_icons:
+      large: commonicon
+      small: smallicon
 generated_files:
   - Assets/Scripts/Notifications/MobileNotificationService.cs
   - Assets/Editor/IntegrationAgent/MobileNotificationTestMenu.cs
@@ -16,4 +42,4 @@ validation:
 manual_steps:
   - Test notification behavior on a real Android device.
   - This integration supports local notifications, not server push notifications.
-
+  - For gley-remote-config, configure Firebase Remote Config keys isNotificationActive and notificationHours.
