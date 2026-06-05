@@ -1,41 +1,64 @@
-# Unity SDK Agent Plugin
+<p align="center">
+  <img src="docs/assets/banner.svg" alt="Unity SDK Agent Plugin" width="100%" />
+</p>
 
-![Unity SDK Agent Plugin banner](docs/assets/banner.svg)
+<p align="center">
+  <a href="#current-scope"><img src="https://img.shields.io/badge/status-MVP-1f8a70" alt="Status: MVP" /></a>
+  <a href="#mobile-notifications"><img src="https://img.shields.io/badge/Unity-Mobile%20SDKs-0b5cad" alt="Unity Mobile SDKs" /></a>
+  <a href="#agent-support"><img src="https://img.shields.io/badge/agent--ready-Codex%20%7C%20Claude%20%7C%20Antigravity-2f4858" alt="Agent ready" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-3d405b" alt="MIT License" /></a>
+</p>
 
-[![Status](https://img.shields.io/badge/status-MVP-1f8a70)](#current-scope)
-[![Unity](https://img.shields.io/badge/Unity-mobile%20SDKs-0b5cad)](#first-integration)
-[![Agent Ready](https://img.shields.io/badge/agent--ready-Codex%20%7C%20Claude%20%7C%20Antigravity-2f4858)](#use-with-ai-agents)
-[![License](https://img.shields.io/badge/license-MIT-3d405b)](LICENSE)
+<p align="center">
+  <strong>Agent-ready Unity SDK integration packs for AI coding agents.</strong>
+  <br />
+  Give Codex, Claude, Antigravity, or another coding agent tested recipes, templates, and validators so Unity SDK work becomes repeatable.
+</p>
 
-Agent-ready Unity SDK integration packs for Codex, Claude, Antigravity, and other AI coding agents.
+<p align="center">
+  <a href="#quick-start">Quick Start</a>
+  |
+  <a href="#mobile-notifications">Mobile Notifications</a>
+  |
+  <a href="#agent-support">Agent Support</a>
+  |
+  <a href="docs/roadmap.md">Roadmap</a>
+</p>
 
-This repo gives AI coding agents exact recipes, templates, validators, and CLI tools so SDK integrations are repeatable instead of guessed from scratch every time.
+---
 
-## What It Does
+## Why This Exists
+
+AI coding agents are good at editing Unity projects, but SDK integrations are fragile when every agent has to rediscover the setup from scratch.
+
+This repo acts as a **Unity SDK integration memory layer**:
+
+| Problem | What this repo adds |
+| --- | --- |
+| Agents guess SDK steps | Exact recipes and profiles |
+| Integrations miss project settings | Validation checks |
+| Third-party SDKs vary by project | Implementation profiles |
+| Users need repeatable results | CLI tools and templates |
+| Future SDKs need structure | One pack per integration |
+
+## How It Works
+
+<p align="center">
+  <img src="docs/assets/architecture.svg" alt="Architecture diagram" width="92%" />
+</p>
 
 ```text
 Developer request
-  -> AI coding agent reads this plugin
+  -> AI agent reads this plugin
   -> Recipe selects exact SDK steps
   -> CLI/templates apply safe changes
-  -> Validator checks the result
-  -> Agent summarizes what changed
+  -> Validator checks the project
+  -> Agent reports changed files and manual steps
 ```
 
-![Architecture diagram](docs/assets/architecture.svg)
+## Quick Start
 
-## First Integration
-
-`mobile-notifications`
-
-- Installs Unity's official `com.unity.mobile.notifications` package.
-- Generates a direct Unity Mobile Notifications wrapper for simple projects.
-- Provides a production validation profile for Gley + Firebase Remote Config setups.
-- Captures a real working project pattern using splash-scene `NotificationsManager`, Android define symbols, notification icons, and Remote Config activation.
-
-## Quick Use
-
-Add mobile notifications:
+Add mobile notifications to a Unity project:
 
 ```powershell
 python cli/unity_sdk_agent.py add mobile-notifications --project "D:\Path\To\UnityProject"
@@ -47,17 +70,46 @@ Validate only:
 python cli/unity_sdk_agent.py validate mobile-notifications --project "D:\Path\To\UnityProject"
 ```
 
-Validate a Gley + Firebase Remote Config production setup:
+Validate an existing Gley + Firebase Remote Config setup:
 
 ```powershell
-python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remote-config --project "D:\Path\To\UnityProject"
+python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remote-config --no-report --project "D:\Path\To\UnityProject"
 ```
 
-Use `--no-report` when you want validation output without writing `IntegrationAgentReports/` into the Unity project.
+<p align="center">
+  <img src="docs/assets/terminal-preview.svg" alt="CLI validation preview" width="86%" />
+</p>
 
-## Use With AI Agents
+## Mobile Notifications
 
-Give Codex, Claude, Antigravity, or another coding agent this prompt:
+`mobile-notifications` is the first integration pack.
+
+| Profile | Purpose | Status |
+| --- | --- | --- |
+| `basic` | Direct Unity Mobile Notifications wrapper | Working MVP |
+| `gley-remote-config` | Validates a production-style Gley + Firebase Remote Config setup | Validated against a real Unity project |
+
+The production profile checks:
+
+- `com.unity.mobile.notifications` package
+- Android define symbol `EnableNotificationsAndroid`
+- Gley notification scripts
+- Splash-scene `NotificationsManager`
+- Firebase Remote Config keys `isNotificationActive` and `notificationHours`
+- Notification icons `commonicon` and `smallicon`
+- Permission, init, focus, and scheduling lifecycle
+
+## Agent Support
+
+| Agent/App | Entry Point | Status |
+| --- | --- | --- |
+| Codex | `codex/SKILL.md` | Ready |
+| Claude | `claude/CLAUDE.md` | Ready |
+| Antigravity | `antigravity/instructions.md` | Ready |
+| Any terminal agent | `cli/unity_sdk_agent.py` | Ready |
+| MCP-compatible apps | `mcp/README.md` | Planned |
+
+Prompt for Codex or another coding agent:
 
 ```text
 Use this repo as the Unity SDK Agent Plugin.
@@ -66,7 +118,7 @@ Add mobile notifications to my Unity project.
 Validate after changes and summarize the report.
 ```
 
-For an existing Gley + Firebase setup:
+Prompt for an existing Gley + Firebase setup:
 
 ```text
 Use this repo as the Unity SDK Agent Plugin.
@@ -74,48 +126,53 @@ Validate mobile notifications with the gley-remote-config profile.
 Do not modify the project; use --no-report if running the CLI.
 ```
 
-## Repo Layout
+## Project Structure
 
 ```text
-core/
-  integrations/
-    mobile-notifications/
-      recipe.md
-      recipe.yaml
-      implementation-profile-gley-remote-config.md
-      templates/
-codex/
-  SKILL.md
-claude/
-  CLAUDE.md
-antigravity/
-  instructions.md
-cli/
-  unity_sdk_agent.py
-docs/
-  assets/
-mcp/
-  README.md
+unity-sdk-agent-plugin/
+  cli/
+    unity_sdk_agent.py
+  codex/
+    SKILL.md
+  claude/
+    CLAUDE.md
+  antigravity/
+    instructions.md
+  core/
+    integrations/
+      mobile-notifications/
+        recipe.md
+        recipe.yaml
+        implementation-profile-gley-remote-config.md
+        templates/
+  docs/
+    assets/
+  mcp/
+    README.md
 ```
 
 ## Current Scope
 
-This is version `0.1`. It focuses on proving the agent-plugin system with one integration.
+This is version `0.1`. It proves the agent-plugin system with one real SDK pack and one production validation profile.
 
-Mobile notifications currently includes two profiles:
+This repo does **not** claim zero-mistake automation across all Unity projects yet. It currently provides:
 
-- `basic`: direct Unity Mobile Notifications wrapper.
-- `gley-remote-config`: validates a real production-style setup using Gley Mobile Push Notifications, Firebase Remote Config, Android define symbols, splash-scene manager placement, and notification icon settings.
+- a working basic integration flow
+- a validated production profile for a Gley + Firebase Remote Config notification setup
+- agent instructions for multiple AI coding apps
+- a structure for adding more SDK packs safely
 
 ## Documentation
 
-- [Quickstart](QUICKSTART.md)
-- [How It Works](docs/how-it-works.md)
-- [Mobile Notifications Integration](core/integrations/mobile-notifications/README.md)
-- [Gley + Firebase Remote Config Profile](core/integrations/mobile-notifications/implementation-profile-gley-remote-config.md)
-- [Roadmap](docs/roadmap.md)
-- [Contributing New SDK Packs](docs/contributing.md)
-- [Example Prompts](examples/prompts.md)
+| Document | Description |
+| --- | --- |
+| [Quickstart](QUICKSTART.md) | Fast usage examples |
+| [How It Works](docs/how-it-works.md) | Architecture and safety model |
+| [Mobile Notifications](core/integrations/mobile-notifications/README.md) | Integration-specific docs |
+| [Gley + Firebase Profile](core/integrations/mobile-notifications/implementation-profile-gley-remote-config.md) | Production implementation profile |
+| [Roadmap](docs/roadmap.md) | Planned SDK packs and tooling |
+| [Contributing](docs/contributing.md) | How to add new integration packs |
+| [Example Prompts](examples/prompts.md) | Copy-paste prompts for agents |
 
 ## Planned SDK Packs
 
@@ -129,6 +186,7 @@ Mobile notifications currently includes two profiles:
 
 ## Important Notes
 
-- This repo does not bundle paid third-party SDKs such as Gley. It validates and wires projects that already include them.
-- Firebase dashboard values still need to be configured in Firebase.
+- Paid third-party SDKs such as Gley are not bundled in this repo.
+- Firebase dashboard values must still be configured in Firebase.
 - Mobile notification behavior must be tested on a real Android device.
+- Recipes should be validated against real projects before being treated as production-ready.

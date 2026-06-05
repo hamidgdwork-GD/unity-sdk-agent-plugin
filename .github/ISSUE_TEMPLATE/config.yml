@@ -1,0 +1,6 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/hamidgdwork-GD/unity-sdk-agent-plugin#documentation
+    about: Read the current docs and integration guides.
+

@@ -1,0 +1,34 @@
+<svg width="1080" height="430" viewBox="0 0 1080 430" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">CLI validation preview</title>
+  <desc id="desc">A stylized terminal preview showing a successful Unity mobile notifications validation.</desc>
+  <defs>
+    <linearGradient id="frame" x1="0" y1="0" x2="1080" y2="430" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#082A3A"/>
+      <stop offset="1" stop-color="#0B5C6B"/>
+    </linearGradient>
+    <filter id="shadow" x="-15%" y="-20%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0B1F28" flood-opacity="0.24"/>
+    </filter>
+  </defs>
+  <rect width="1080" height="430" rx="24" fill="#F6FBF8"/>
+  <g filter="url(#shadow)">
+    <rect x="74" y="54" width="932" height="322" rx="18" fill="url(#frame)"/>
+    <rect x="74" y="54" width="932" height="48" rx="18" fill="#061E2B"/>
+    <circle cx="108" cy="78" r="7" fill="#EF6F6C"/>
+    <circle cx="132" cy="78" r="7" fill="#F2C94C"/>
+    <circle cx="156" cy="78" r="7" fill="#1F8A70"/>
+    <text x="190" y="84" fill="#D7F6EA" font-family="Consolas, Menlo, monospace" font-size="15">unity-sdk-agent-plugin</text>
+    <text x="104" y="143" fill="#D7F6EA" font-family="Consolas, Menlo, monospace" font-size="19">python cli/unity_sdk_agent.py validate mobile-notifications \</text>
+    <text x="104" y="176" fill="#D7F6EA" font-family="Consolas, Menlo, monospace" font-size="19">  --profile gley-remote-config --no-report --project "D:\UnityProject"</text>
+    <rect x="104" y="211" width="256" height="34" rx="8" fill="#1F8A70"/>
+    <text x="124" y="234" fill="#FFFFFF" font-family="Consolas, Menlo, monospace" font-size="17" font-weight="700">validation: passed</text>
+    <text x="104" y="278" fill="#F6FBF8" font-family="Consolas, Menlo, monospace" font-size="17">✓ Unity Mobile Notifications package</text>
+    <text x="104" y="311" fill="#F6FBF8" font-family="Consolas, Menlo, monospace" font-size="17">✓ Gley facade + Android define symbol</text>
+    <text x="104" y="344" fill="#F6FBF8" font-family="Consolas, Menlo, monospace" font-size="17">✓ Remote Config keys + splash-scene manager</text>
+    <rect x="672" y="220" width="276" height="106" rx="14" fill="#F6FBF8" fill-opacity="0.1" stroke="#D7F6EA" stroke-opacity="0.26"/>
+    <text x="700" y="255" fill="#D7F6EA" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700">Report</text>
+    <text x="700" y="287" fill="#F6FBF8" font-family="Segoe UI, Arial, sans-serif" font-size="15">changed_files: []</text>
+    <text x="700" y="313" fill="#F6FBF8" font-family="Segoe UI, Arial, sans-serif" font-size="15">manual_steps: device test</text>
+  </g>
+</svg>
+
