@@ -90,6 +90,14 @@ python cli/unity_sdk_agent.py configure-gley-notifications --project "D:\Path\To
 
 This command installs/copies Gley if missing, adds the Unity Mobile Notifications package, adds the Android define symbol, writes Mobile Notification icon settings using the target project's actual icon GUIDs, and places the `NotificationsManager` prefab into the first enabled build scene.
 
+Then open Unity and run:
+
+```text
+Tools > Integration Agent > Mobile Notifications > Configure Gley Notification Settings
+```
+
+This final Unity-side step uses the Mobile Notifications package editor API so the Project Settings UI displays `commonicon` and `smallicon` correctly.
+
 <p align="center">
   <img src="docs/assets/terminal-preview.svg" alt="CLI validation preview" width="86%" />
 </p>

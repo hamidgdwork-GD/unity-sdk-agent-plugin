@@ -46,6 +46,26 @@ python cli/unity_sdk_agent.py configure-gley-notifications --project "D:\Project
 
 This is the full setup command. Do not stop after `install-gley`; that only copies the plugin files.
 
+After running `configure-gley-notifications`, the target Unity project contains:
+
+```text
+Assets/Editor/IntegrationAgent/GleyNotificationUnityConfigurator.cs
+```
+
+Tell the user to open Unity and run:
+
+```text
+Tools > Integration Agent > Mobile Notifications > Configure Gley Notification Settings
+```
+
+If Unity batchmode is available, run:
+
+```text
+-executeMethod IntegrationAgent.Editor.GleyNotificationUnityConfigurator.ConfigureForBatchmode
+```
+
+Then validate again. The Mobile Notifications Project Settings UI should show `commonicon` and `smallicon`.
+
 Validation only:
 
 ```powershell

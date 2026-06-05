@@ -118,5 +118,20 @@ This command must be used when the user expects the full production setup. It co
 
 - Android define symbol `EnableNotificationsAndroid`
 - `ProjectSettings/NotificationsSettings.asset` with target-project icon GUIDs
+- `Assets/Editor/IntegrationAgent/GleyNotificationUnityConfigurator.cs`, which can configure Mobile Notifications through Unity's editor API
 - first enabled build scene prefab placement for `NotificationsManager`
 - validation report for the `gley-remote-config` profile
+
+After running `configure-gley-notifications`, open Unity and run:
+
+```text
+Tools > Integration Agent > Mobile Notifications > Configure Gley Notification Settings
+```
+
+Or run Unity in batchmode with:
+
+```text
+-executeMethod IntegrationAgent.Editor.GleyNotificationUnityConfigurator.ConfigureForBatchmode
+```
+
+This step is important because Unity's Mobile Notifications Project Settings panel is controlled by package editor code, and direct JSON edits can be ignored by the UI in some projects.

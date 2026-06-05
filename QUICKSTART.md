@@ -47,3 +47,9 @@ python cli/unity_sdk_agent.py configure-gley-notifications --project "D:\Path\To
 ```
 
 Use this when the project should match the production profile, including Mobile Notification icon settings and startup scene prefab placement.
+
+After opening Unity, run:
+
+```text
+Tools > Integration Agent > Mobile Notifications > Configure Gley Notification Settings
+```

@@ -317,6 +317,7 @@ def validate_mobile_notifications(project: Path, profile: str = "basic") -> dict
         gley_manager = project / "Assets" / "GleyPlugins" / "Implementation" / "NotificationsManager.cs"
         gley_prefab = project / "Assets" / "GleyPlugins" / "Implementation" / "NotificationsManager.prefab"
         gley_settings = project / "Assets" / "GleyPlugins" / "Notifications" / "Resources" / "NotificationSettingsData.asset"
+        unity_configurator = project / "Assets" / "Editor" / "IntegrationAgent" / "GleyNotificationUnityConfigurator.cs"
         startup_scene = get_first_enabled_scene(project)
         startup_scene_path = project / startup_scene if startup_scene else project / "Assets" / "CodeArchitecture" / "Scenes" / "SplashScene.unity"
 
@@ -357,6 +358,11 @@ def validate_mobile_notifications(project: Path, profile: str = "basic") -> dict
                 "Gley NotificationSettingsData is enabled for Android."
             ),
             (
+                "unity_notification_configurator",
+                file_contains(unity_configurator, ["NotificationSettings.AndroidSettings.AddDrawableResource", "commonicon", "smallicon"]),
+                "Unity editor configurator exists to apply Mobile Notifications icons through the package API."
+            ),
+            (
                 "firebase_remote_config_hook",
                 file_contains(firebase_script, ["Firebase.RemoteConfig", "isNotificationActive", "notificationHours", "NotificationsManager.Instance.Init()"]),
                 "Firebase Remote Config hook sets notification active/hour values and initializes NotificationsManager."
@@ -382,6 +388,7 @@ def validate_mobile_notifications(project: Path, profile: str = "basic") -> dict
         "checks": checks,
         "manual_steps": [
             "Open the project in Unity so Package Manager can resolve the package.",
+            "In Unity, run Tools > Integration Agent > Mobile Notifications > Configure Gley Notification Settings so the Mobile Notifications UI applies commonicon and smallicon.",
             "Test notification scheduling on a real Android device.",
             "This integration adds local notifications, not remote push notifications.",
             "For the gley-remote-config profile, configure Firebase Remote Config keys: isNotificationActive and notificationHours."
@@ -450,6 +457,13 @@ def configure_gley_notifications(project: Path, scene_path: str | None = None, w
 
     if write_mobile_notification_settings(project):
         changed_files.append("ProjectSettings/NotificationsSettings.asset")
+
+    if copy_template(
+        "GleyNotificationUnityConfigurator.cs",
+        project,
+        "Assets/Editor/IntegrationAgent/GleyNotificationUnityConfigurator.cs"
+    ):
+        changed_files.append("Assets/Editor/IntegrationAgent/GleyNotificationUnityConfigurator.cs")
 
     placed_prefab, configured_scene = place_notifications_prefab_in_scene(project, scene_path)
     if placed_prefab:
