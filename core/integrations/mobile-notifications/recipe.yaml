@@ -1,0 +1,19 @@
+id: mobile-notifications
+name: Mobile Notifications
+provider: unity_mobile_notifications
+unity_package:
+  name: com.unity.mobile.notifications
+  version: 2.3.2
+targets:
+  - unity_android
+generated_files:
+  - Assets/Scripts/Notifications/MobileNotificationService.cs
+  - Assets/Editor/IntegrationAgent/MobileNotificationTestMenu.cs
+validation:
+  - Packages/manifest.json contains com.unity.mobile.notifications
+  - Assets/Scripts/Notifications/MobileNotificationService.cs exists
+  - Assets/Editor/IntegrationAgent/MobileNotificationTestMenu.cs exists
+manual_steps:
+  - Test notification behavior on a real Android device.
+  - This integration supports local notifications, not server push notifications.
+
