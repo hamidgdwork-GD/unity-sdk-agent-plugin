@@ -32,7 +32,7 @@ Matches the proven production pattern from `Angry Crocodile Simulator Stickman V
 - Firebase Remote Config keys:
   - `isNotificationActive` (`bool`)
   - `notificationHours` (`long/int`)
-- Notification icons configured in `ProjectSettings/NotificationsSettings.asset`:
+- Notification icons configured by Unity's Mobile Notifications editor API:
   - large icon id: `commonicon`
   - small icon id: `smallicon`
 - Scheduling happens when the app loses focus.
@@ -56,7 +56,7 @@ When the project uses Gley notifications and Firebase Remote Config, the agent m
 3. Add or confirm Android define symbol `EnableNotificationsAndroid`.
 4. Confirm Gley settings asset has `useForAndroid: 1`.
 5. Create or confirm a `NotificationsManager` prefab/object.
-6. Ensure `NotificationsManager` is present in the splash/first boot scene.
+6. Ensure `NotificationsManager` is present in the first enabled build scene by running the Unity Editor configurator.
 7. Ensure Firebase Remote Config applies `isNotificationActive` and `notificationHours`.
 8. Ensure Firebase only calls `NotificationsManager.Instance.Init()` when notifications are active.
 9. Validate `commonicon` and `smallicon` exist in Mobile Notifications settings.
@@ -81,7 +81,7 @@ The integration is valid when:
 For `gley-remote-config`, it is also valid when:
 
 - `EnableNotificationsAndroid` is present in Android scripting define symbols.
-- `ProjectSettings/NotificationsSettings.asset` includes `commonicon` and `smallicon`.
+- Unity Mobile Notifications Project Settings includes `commonicon` and `smallicon`.
 - Gley notification scripts exist.
 - `Assets/GleyPlugins/Implementation/NotificationsManager.cs` contains remote config flags and focus lifecycle.
 - `Assets/GleyPlugins/Implementation/NotificationsManager.prefab` contains the serialized New Day notification data.
@@ -117,10 +117,11 @@ python cli/unity_sdk_agent.py configure-gley-notifications --project "<UnityProj
 This command must be used when the user expects the full production setup. It configures these pieces in addition to copying/installing packages:
 
 - Android define symbol `EnableNotificationsAndroid`
-- `ProjectSettings/NotificationsSettings.asset` with target-project icon GUIDs
-- `Assets/Editor/IntegrationAgent/GleyNotificationUnityConfigurator.cs`, which can configure Mobile Notifications through Unity's editor API
-- first enabled build scene prefab placement for `NotificationsManager`
+- `Assets/Editor/IntegrationAgent/GleyNotificationUnityConfigurator.cs`, which configures Mobile Notifications through Unity's editor API
+- Unity-side first enabled build scene prefab placement for `NotificationsManager`
 - validation report for the `gley-remote-config` profile
+
+The CLI must not directly edit `.unity` scene YAML and must not directly write `ProjectSettings/NotificationsSettings.asset`. The generated Unity Editor configurator owns those changes.
 
 After running `configure-gley-notifications`, open Unity and run:
 
@@ -134,4 +135,12 @@ Or run Unity in batchmode with:
 -executeMethod IntegrationAgent.Editor.GleyNotificationUnityConfigurator.ConfigureForBatchmode
 ```
 
-This step is important because Unity's Mobile Notifications Project Settings panel is controlled by package editor code, and direct JSON edits can be ignored by the UI in some projects.
+This step is required because Unity's Mobile Notifications Project Settings panel is controlled by package editor code, and direct JSON edits can be ignored by the UI in some projects. The same step places `NotificationsManager` using `EditorSceneManager` and `PrefabUtility`, which avoids scene corruption from manual YAML edits.
+
+On success, the Unity configurator writes:
+
+```text
+IntegrationAgentReports/gley-notifications-unity-configurator-status.json
+```
+
+Validation requires this report so an agent cannot claim completion before Unity has actually applied the settings.

@@ -88,7 +88,7 @@ Configure the full Gley notification profile:
 python cli/unity_sdk_agent.py configure-gley-notifications --project "D:\Path\To\UnityProject"
 ```
 
-This command installs/copies Gley if missing, adds the Unity Mobile Notifications package, adds the Android define symbol, writes Mobile Notification icon settings using the target project's actual icon GUIDs, and places the `NotificationsManager` prefab into the first enabled build scene.
+This command installs/copies Gley if missing, adds the Unity Mobile Notifications package, adds the Android define symbol, and generates the Unity-side configurator. It stages safe file changes only; it does not edit Unity scene YAML or `ProjectSettings/NotificationsSettings.asset` directly.
 
 Then open Unity and run:
 
@@ -96,7 +96,7 @@ Then open Unity and run:
 Tools > Integration Agent > Mobile Notifications > Configure Gley Notification Settings
 ```
 
-This final Unity-side step uses the Mobile Notifications package editor API so the Project Settings UI displays `commonicon` and `smallicon` correctly.
+This mandatory Unity-side step uses the Mobile Notifications package editor API so the Project Settings UI displays `commonicon` and `smallicon` correctly. It also uses Unity's `EditorSceneManager` and `PrefabUtility` to place `NotificationsManager` in the first enabled build scene without corrupting the scene file, then writes `IntegrationAgentReports/gley-notifications-unity-configurator-status.json` so validation can prove the Unity step ran.
 
 <p align="center">
   <img src="docs/assets/terminal-preview.svg" alt="CLI validation preview" width="86%" />

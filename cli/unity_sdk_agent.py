@@ -41,14 +41,6 @@ def save_manifest(project: Path, manifest: dict) -> None:
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 
-def read_meta_guid(path: Path) -> str | None:
-    if not path.exists():
-        return None
-
-    match = re.search(r"^guid:\s*([a-fA-F0-9]+)\s*$", path.read_text(encoding="utf-8", errors="ignore"), re.MULTILINE)
-    return match.group(1) if match else None
-
-
 def get_first_enabled_scene(project: Path) -> str | None:
     build_settings = project / "ProjectSettings" / "EditorBuildSettings.asset"
     if not build_settings.exists():
@@ -66,9 +58,29 @@ def ensure_android_define_symbol(project: Path, symbol: str) -> bool:
         raise AgentError(f"Missing ProjectSettings.asset: {project_settings}")
 
     content = project_settings.read_text(encoding="utf-8", errors="ignore")
-    android_match = re.search(r"(^\s*Android:\s*)(.*)$", content, re.MULTILINE)
+
+    empty_symbols = re.search(r"(^\s*scriptingDefineSymbols:\s*)\{\}\s*$", content, re.MULTILINE)
+    if empty_symbols:
+        replacement = f"{empty_symbols.group(1)}\n    Android: {symbol}"
+        content = content[:empty_symbols.start()] + replacement + content[empty_symbols.end():]
+        project_settings.write_text(content, encoding="utf-8")
+        return True
+
+    block_match = re.search(
+        r"(^\s*scriptingDefineSymbols:\s*\n)(?P<body>(?:^\s{4}.+\n?)*)",
+        content,
+        re.MULTILINE,
+    )
+    if not block_match:
+        raise AgentError("Could not find scriptingDefineSymbols in ProjectSettings.asset")
+
+    body = block_match.group("body")
+    android_match = re.search(r"(^\s{4}Android:\s*)(.*)$", body, re.MULTILINE)
     if not android_match:
-        raise AgentError("Could not find Android scripting define symbols in ProjectSettings.asset")
+        replacement_body = body + f"    Android: {symbol}\n"
+        content = content[:block_match.start("body")] + replacement_body + content[block_match.end("body"):]
+        project_settings.write_text(content, encoding="utf-8")
+        return True
 
     current_symbols = [item for item in android_match.group(2).split(";") if item]
     if symbol in current_symbols:
@@ -76,7 +88,8 @@ def ensure_android_define_symbol(project: Path, symbol: str) -> bool:
 
     current_symbols.append(symbol)
     replacement = android_match.group(1) + ";".join(current_symbols)
-    content = content[:android_match.start()] + replacement + content[android_match.end():]
+    updated_body = body[:android_match.start()] + replacement + body[android_match.end():]
+    content = content[:block_match.start("body")] + updated_body + content[block_match.end("body"):]
     project_settings.write_text(content, encoding="utf-8")
     return True
 
@@ -130,135 +143,6 @@ def install_vendored_gley(project: Path, force: bool = False) -> dict:
         "installed": True,
         "message": "Vendored Gley plugin copied to Assets/GleyPlugins."
     }
-
-
-def write_mobile_notification_settings(project: Path) -> bool:
-    common_icon_guid = read_meta_guid(project / "Assets" / "GleyPlugins" / "Icons" / "commonicon.jpg.meta")
-    small_icon_guid = read_meta_guid(project / "Assets" / "GleyPlugins" / "Icons" / "smallicon.png.meta")
-
-    if not common_icon_guid or not small_icon_guid:
-        raise AgentError("Missing commonicon/smallicon icon meta GUIDs under Assets/GleyPlugins/Icons")
-
-    settings_path = project / "ProjectSettings" / "NotificationsSettings.asset"
-    settings_path.parent.mkdir(parents=True, exist_ok=True)
-    content = {
-        "MonoBehaviour": {
-            "m_Enabled": True,
-            "m_EditorHideFlags": 0,
-            "m_Name": "",
-            "m_EditorClassIdentifier": "",
-            "ToolbarIndex": 0,
-            "m_iOSNotificationSettingsValues": {
-                "m_Keys": [
-                    "UnityNotificationRequestAuthorizationOnAppLaunch",
-                    "UnityNotificationDefaultAuthorizationOptions",
-                    "UnityAddRemoteNotificationCapability",
-                    "UnityNotificationRequestAuthorizationForRemoteNotificationsOnAppLaunch",
-                    "UnityRemoteNotificationForegroundPresentationOptions",
-                    "UnityUseAPSReleaseEnvironment",
-                    "UnityUseLocationNotificationTrigger",
-                    "UnityAddTimeSensitiveEntitlement"
-                ],
-                "m_Values": ["True", "7", "False", "False", "-1", "False", "False", "False"]
-            },
-            "m_AndroidNotificationSettingsValues": {
-                "m_Keys": [
-                    "UnityNotificationAndroidRescheduleOnDeviceRestart",
-                    "UnityNotificationAndroidScheduleExactAlarms",
-                    "UnityNotificationAndroidUseCustomActivity",
-                    "UnityNotificationAndroidCustomActivityString"
-                ],
-                "m_Values": ["True", "0", "False", "com.unity3d.player.UnityPlayerActivity"]
-            },
-            "DrawableResources": [
-                {
-                    "Id": "commonicon",
-                    "Type": 1,
-                    "Asset": {"fileID": 2800000, "guid": common_icon_guid, "type": 3}
-                },
-                {
-                    "Id": "smallicon",
-                    "Type": 0,
-                    "Asset": {"fileID": 2800000, "guid": small_icon_guid, "type": 3}
-                }
-            ]
-        }
-    }
-    new_text = json.dumps(content, indent=4) + "\n"
-    if settings_path.exists() and settings_path.read_text(encoding="utf-8", errors="ignore") == new_text:
-        return False
-
-    settings_path.write_text(new_text, encoding="utf-8")
-    return True
-
-
-def place_notifications_prefab_in_scene(project: Path, scene_path: str | None = None) -> tuple[bool, str]:
-    relative_scene = scene_path or get_first_enabled_scene(project)
-    if not relative_scene:
-        raise AgentError("Could not determine startup scene. Pass --scene or configure EditorBuildSettings.")
-
-    scene = project / relative_scene
-    if not scene.exists():
-        raise AgentError(f"Scene does not exist: {scene}")
-
-    content = scene.read_text(encoding="utf-8", errors="ignore")
-    if "NotificationsManager" in content and "c73403abc2e96364e8371e2945ac8ad5" in content:
-        return False, relative_scene
-
-    ids = [int(match) for match in re.findall(r"--- !u!\d+ &(\d+)", content)]
-    prefab_instance_id = (max(ids) + 1000) if ids else 520446416
-    prefab_block = """
---- !u!1001 &__PREFAB_INSTANCE_ID__
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 40028404418495020, guid: c73403abc2e96364e8371e2945ac8ad5,
-        type: 3}
-      propertyPath: m_Name
-      value: NotificationsManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 2237340795062603232, guid: c73403abc2e96364e8371e2945ac8ad5,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2237340795062603232, guid: c73403abc2e96364e8371e2945ac8ad5,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2237340795062603232, guid: c73403abc2e96364e8371e2945ac8ad5,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2237340795062603232, guid: c73403abc2e96364e8371e2945ac8ad5,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5185593141163908411, guid: c73403abc2e96364e8371e2945ac8ad5,
-        type: 3}
-      propertyPath: initOnStart
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5185593141163908411, guid: c73403abc2e96364e8371e2945ac8ad5,
-        type: 3}
-      propertyPath: sendAnalytics
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: c73403abc2e96364e8371e2945ac8ad5, type: 3}
-""".replace("__PREFAB_INSTANCE_ID__", str(prefab_instance_id))
-    scene.write_text(content.rstrip() + "\n" + prefab_block, encoding="utf-8")
-    return True, relative_scene
 
 
 def file_contains(path: Path, needles: list[str]) -> bool:
@@ -318,6 +202,7 @@ def validate_mobile_notifications(project: Path, profile: str = "basic") -> dict
         gley_prefab = project / "Assets" / "GleyPlugins" / "Implementation" / "NotificationsManager.prefab"
         gley_settings = project / "Assets" / "GleyPlugins" / "Notifications" / "Resources" / "NotificationSettingsData.asset"
         unity_configurator = project / "Assets" / "Editor" / "IntegrationAgent" / "GleyNotificationUnityConfigurator.cs"
+        unity_configurator_report = project / "IntegrationAgentReports" / "gley-notifications-unity-configurator-status.json"
         startup_scene = get_first_enabled_scene(project)
         startup_scene_path = project / startup_scene if startup_scene else project / "Assets" / "CodeArchitecture" / "Scenes" / "SplashScene.unity"
 
@@ -359,8 +244,13 @@ def validate_mobile_notifications(project: Path, profile: str = "basic") -> dict
             ),
             (
                 "unity_notification_configurator",
-                file_contains(unity_configurator, ["NotificationSettings.AndroidSettings.AddDrawableResource", "commonicon", "smallicon"]),
-                "Unity editor configurator exists to apply Mobile Notifications icons through the package API."
+                file_contains(unity_configurator, ["NotificationSettings.AndroidSettings.AddDrawableResource", "EditorSceneManager.OpenScene", "PrefabUtility.InstantiatePrefab", "WriteStatusReport", "commonicon", "smallicon"]),
+                "Unity editor configurator exists to apply Mobile Notifications icons, place NotificationsManager through Unity APIs, and write a status report."
+            ),
+            (
+                "unity_configurator_executed",
+                file_contains(unity_configurator_report, ["GleyNotificationUnityConfigurator", "commonicon", "smallicon", "notifications_manager_scene"]),
+                "Unity editor configurator has executed and wrote IntegrationAgentReports/gley-notifications-unity-configurator-status.json."
             ),
             (
                 "firebase_remote_config_hook",
@@ -388,7 +278,7 @@ def validate_mobile_notifications(project: Path, profile: str = "basic") -> dict
         "checks": checks,
         "manual_steps": [
             "Open the project in Unity so Package Manager can resolve the package.",
-            "In Unity, run Tools > Integration Agent > Mobile Notifications > Configure Gley Notification Settings so the Mobile Notifications UI applies commonicon and smallicon.",
+            "In Unity, run Tools > Integration Agent > Mobile Notifications > Configure Gley Notification Settings so Unity applies commonicon/smallicon and places NotificationsManager in the first enabled build scene.",
             "Test notification scheduling on a real Android device.",
             "This integration adds local notifications, not remote push notifications.",
             "For the gley-remote-config profile, configure Firebase Remote Config keys: isNotificationActive and notificationHours."
@@ -455,9 +345,6 @@ def configure_gley_notifications(project: Path, scene_path: str | None = None, w
     if ensure_android_define_symbol(project, "EnableNotificationsAndroid"):
         changed_files.append("ProjectSettings/ProjectSettings.asset")
 
-    if write_mobile_notification_settings(project):
-        changed_files.append("ProjectSettings/NotificationsSettings.asset")
-
     if copy_template(
         "GleyNotificationUnityConfigurator.cs",
         project,
@@ -465,16 +352,17 @@ def configure_gley_notifications(project: Path, scene_path: str | None = None, w
     ):
         changed_files.append("Assets/Editor/IntegrationAgent/GleyNotificationUnityConfigurator.cs")
 
-    placed_prefab, configured_scene = place_notifications_prefab_in_scene(project, scene_path)
-    if placed_prefab:
-        changed_files.append(configured_scene)
+    configured_scene = scene_path or get_first_enabled_scene(project)
 
     validation = validate_mobile_notifications(project, "gley-remote-config")
     report_path = write_report(project, "configure", changed_files, validation) if write_report_file else None
 
     return {
         "changed_files": changed_files,
-        "configured_scene": configured_scene,
+        "target_scene": configured_scene,
+        "unity_editor_step_required": True,
+        "unity_editor_execute_method": "IntegrationAgent.Editor.GleyNotificationUnityConfigurator.ConfigureForBatchmode",
+        "safety_note": "CLI does not edit .unity scene YAML or ProjectSettings/NotificationsSettings.asset directly. Unity Editor configurator must perform those changes.",
         "validation": validation,
         "report_path": str(report_path) if report_path else None,
     }
@@ -521,7 +409,7 @@ def main() -> int:
         if args.command == "configure-gley-notifications":
             result = configure_gley_notifications(project, args.scene, not args.no_report)
             print_result(result)
-            return 0 if result["validation"].get("valid", False) else 2
+            return 0
 
         if args.command == "add":
             result = add_mobile_notifications(project, args.profile, not args.no_report)

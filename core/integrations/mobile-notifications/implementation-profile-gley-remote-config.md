@@ -17,9 +17,9 @@ It should be used when a Unity mobile project already uses Gley Mobile Push Noti
 - `Assets/GleyPlugins/Implementation/NotificationsManager.cs`
 - `Assets/GleyPlugins/Implementation/NotificationsManager.prefab`
 - `Assets/GleyPlugins/Notifications/Resources/NotificationSettingsData.asset`
-- `ProjectSettings/NotificationsSettings.asset`
+- Mobile Notifications Project Settings configured through Unity's editor API
 - `Assets/Scripts/firebasecall.cs` or equivalent Firebase Remote Config bootstrap script
-- Splash/boot scene containing a `NotificationsManager` object or prefab instance
+- First enabled build scene containing a `NotificationsManager` object or prefab instance
 
 ## Required Android Define Symbol
 
@@ -47,7 +47,7 @@ useForAndroid: 1
 
 ## Mobile Notification Icons
 
-`ProjectSettings/NotificationsSettings.asset` should define these Android drawable ids:
+Unity Mobile Notifications Project Settings should define these Android drawable ids:
 
 ```text
 commonicon
@@ -60,6 +60,12 @@ The game manager uses:
 public string iconLarge = "commonicon";
 public string iconSmall = "smallicon";
 ```
+
+Do not directly write `ProjectSettings/NotificationsSettings.asset`. Run the generated Unity Editor configurator so the Mobile Notifications package stores settings through its own API.
+
+## Scene Placement Safety
+
+`NotificationsManager` must be placed by Unity through `EditorSceneManager` and `PrefabUtility`. Do not append prefab YAML to `.unity` files; manual scene serialization can corrupt the splash/startup scene.
 
 ## Remote Config Keys
 
@@ -104,4 +110,3 @@ The project-level `NotificationsManager` should:
 ```powershell
 python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remote-config --project "<UnityProjectPath>"
 ```
-

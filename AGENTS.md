@@ -30,9 +30,11 @@ This command is responsible for:
 - copying bundled Gley if `Assets/GleyPlugins` is missing
 - adding Android define symbol `EnableNotificationsAndroid`
 - generating `Assets/Editor/IntegrationAgent/GleyNotificationUnityConfigurator.cs`
-- writing notification settings data
-- placing `NotificationsManager` in the first enabled build scene
-- validating the `gley-remote-config` profile
+- staging the Unity-side configurator that applies Mobile Notification settings
+- staging the Unity-side configurator that places `NotificationsManager` in the first enabled build scene
+- writing a validation report
+
+Safety rule: the CLI must not directly edit `.unity` scene YAML and must not directly write `ProjectSettings/NotificationsSettings.asset`. Those files are Unity-owned and must be changed by the generated Unity Editor configurator.
 
 ## Required Unity Editor Step
 
@@ -56,6 +58,8 @@ Tools > Integration Agent > Mobile Notifications > Configure Gley Notification S
 ```
 
 This step is not optional. It uses Unity's official Mobile Notifications editor API to make `commonicon` and `smallicon` appear in Project Settings.
+It also opens the first enabled build scene through `EditorSceneManager`, instantiates `Assets/GleyPlugins/Implementation/NotificationsManager.prefab` through `PrefabUtility`, sets `initOnStart = false` and `sendAnalytics = true`, then saves the scene through Unity.
+When it succeeds, it writes `IntegrationAgentReports/gley-notifications-unity-configurator-status.json`. Validation must not be considered complete unless this report exists.
 
 ## Validation
 
@@ -66,12 +70,13 @@ python cli/unity_sdk_agent.py validate mobile-notifications --profile gley-remot
 ```
 
 The integration is incomplete if validation fails or if Unity Project Settings > Mobile Notifications shows an empty notification icon list.
+The integration is also incomplete if `unity_configurator_executed` fails, because that means the Unity-side setup did not run.
 
 ## Do Not
 
 - Do not run only `install-gley` and call the task done.
 - Do not run only `add mobile-notifications` for production projects.
 - Do not rely only on manual JSON edits to `ProjectSettings/NotificationsSettings.asset`.
+- Do not manually append prefab YAML to `.unity` scene files. This can corrupt the startup/splash scene.
 - Do not overwrite an existing `Assets/GleyPlugins` with `--force` unless the user explicitly approves.
 - Do not claim the integration is complete until validation passes and the Unity-side icon configurator has been executed or explicitly reported as pending.
-

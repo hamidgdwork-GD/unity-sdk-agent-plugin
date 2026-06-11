@@ -15,6 +15,7 @@ Read the root `AGENTS.md` first. It contains the canonical workflow for mobile n
 - Validate after applying an integration.
 - Report changed files, validation status, and manual steps.
 - Ask before destructive actions. This plugin does not delete project files.
+- Never manually edit `.unity` scene YAML or directly write `ProjectSettings/NotificationsSettings.asset` for this integration. The generated Unity Editor configurator must make those Unity-owned changes.
 
 ## Supported Integrations
 
@@ -61,7 +62,7 @@ If Unity batchmode is available, run:
 -executeMethod IntegrationAgent.Editor.GleyNotificationUnityConfigurator.ConfigureForBatchmode
 ```
 
-Then validate again. The Mobile Notifications Project Settings UI should show `commonicon` and `smallicon`.
+Then validate again. The Mobile Notifications Project Settings UI should show `commonicon` and `smallicon`, and the first enabled build scene should contain `NotificationsManager`.
 
 Validation only:
 

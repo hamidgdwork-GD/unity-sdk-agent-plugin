@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Unity.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -170,21 +172,17 @@ public class NotificationsManager : MonoBehaviour
         while (request.Status == PermissionStatus.RequestPending) yield return null;
         
         PlayerPrefs.SetInt("ReqNotifyStatus", 1); // Mark as requested
-        //if (sendAnalytics) AnalyticsManager.Instance.Send_DesignEvent_FB_GA("Notifications_Permission_Shown");
-        if (sendAnalytics)  firebasecall.Instance?.Event("Notifications_Permission_Shown");
+        TrackNotificationAnalyticsEvent("Notifications_Permission_Shown");
         if (request.Status == PermissionStatus.Allowed)
         {
             if(isDebug) Debug.LogError("Notification permission granted on Android!");
-            //if (sendAnalytics) AnalyticsManager.Instance.Send_DesignEvent_FB_GA("Notifications_Permission_Allowed");
-            if (sendAnalytics)  firebasecall.Instance?.Event("Notifications_Permission_Allowed");
+            TrackNotificationAnalyticsEvent("Notifications_Permission_Allowed");
             InitializeNotifications();
         }
         else
         {
             if(isDebug) Debug.LogError("Notification permission denied on Android.");
-            //if (sendAnalytics) AnalyticsManager.Instance.Send_DesignEvent_FB_GA("Notifications_Permission_Denied");
-            if (sendAnalytics)  firebasecall.Instance?.Event("Notifications_Permission_Denied");
-            
+            TrackNotificationAnalyticsEvent("Notifications_Permission_Denied");
         }
     }
     #endif
@@ -265,16 +263,40 @@ public class NotificationsManager : MonoBehaviour
 
     private void SendAppOpenFromNotificationEvent()
     {
-        //if (sendAnalytics) AnalyticsManager.Instance.Send_DesignEvent_FB_GA("Notifications_Initialized");
-        if (sendAnalytics)  firebasecall.Instance?.Event("Notifications_Initialized");
+        TrackNotificationAnalyticsEvent("Notifications_Initialized");
         currentIntentData = GleyNotifications.AppWasOpenFromNotification();
         if (currentIntentData == null) return;
         if (isDebug) Debug.LogError(" : Notifications Intend Data : " + currentIntentData);
         if (currentIntentData == notifyNewDay.intentDataString)
         {
-            //if (sendAnalytics) AnalyticsManager.Instance.Send_DesignEvent_FB_GA(notifyNewDay.eventString);
-            if (sendAnalytics)  firebasecall.Instance?.Event(notifyNewDay.eventString);
-            
+            TrackNotificationAnalyticsEvent(notifyNewDay.eventString);
+        }
+    }
+
+    private void TrackNotificationAnalyticsEvent(string eventName)
+    {
+        if (!sendAnalytics || string.IsNullOrEmpty(eventName)) return;
+
+        try
+        {
+            var firebaseType = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(assembly => assembly.GetTypes())
+                .FirstOrDefault(type => type.Name == "firebasecall");
+            if (firebaseType == null) return;
+
+            var instance = firebaseType
+                .GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)
+                ?.GetValue(null);
+            if (instance == null) return;
+
+            firebaseType
+                .GetMethod("Event", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(string) }, null)
+                ?.Invoke(instance, new object[] { eventName });
+        }
+        catch (Exception exception)
+        {
+            if (isDebug) Debug.LogWarning("Notification analytics event failed: " + exception.Message);
         }
     }
 
