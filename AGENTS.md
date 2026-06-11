@@ -79,4 +79,5 @@ The integration is also incomplete if `unity_configurator_executed` fails, becau
 - Do not rely only on manual JSON edits to `ProjectSettings/NotificationsSettings.asset`.
 - Do not manually append prefab YAML to `.unity` scene files. This can corrupt the startup/splash scene.
 - Do not overwrite an existing `Assets/GleyPlugins` with `--force` unless the user explicitly approves.
+- Do not ask for approval just because `Assets/GleyPlugins` is missing. The owner-approved bundled Gley copy is part of the production setup and should be installed automatically by `configure-gley-notifications`.
 - Do not claim the integration is complete until validation passes and the Unity-side icon configurator has been executed or explicitly reported as pending.

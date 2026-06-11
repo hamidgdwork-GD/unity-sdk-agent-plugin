@@ -67,7 +67,8 @@ When the project uses Gley notifications and Firebase Remote Config, the agent m
 - Android 13+ may require runtime notification permission behavior depending on Unity package handling and OS version.
 - This recipe provides local notifications, not remote push notifications from a server.
 - This repo includes an owner-approved vendored Gley copy under `vendor/gley-mobile-push-notifications/Assets/GleyPlugins`.
-- If Gley is missing, copy the vendored `Assets/GleyPlugins` folder into the target project only after confirming the user wants the bundled plugin installed.
+- If Gley is missing, copy the vendored `Assets/GleyPlugins` folder into the target project automatically as part of `configure-gley-notifications`.
+- Ask for approval only before overwriting an existing `Assets/GleyPlugins` folder.
 - Firebase dashboard values must be configured manually or through a separate Firebase admin workflow.
 
 ## Validation

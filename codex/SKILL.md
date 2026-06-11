@@ -10,7 +10,7 @@ Read the root `AGENTS.md` first. It contains the canonical workflow for mobile n
 - Prefer the CLI tool in `cli/unity_sdk_agent.py` for supported integrations.
 - Do not invent SDK steps when a recipe exists.
 - Gley Mobile Push Notifications is vendored under `vendor/gley-mobile-push-notifications` with owner approval.
-- If Gley is required and missing from the target project, ask before copying the vendored `Assets/GleyPlugins` folder into the target Unity project's `Assets/` folder.
+- If Gley is required and missing from the target project, the production configurator should copy the owner-approved vendored `Assets/GleyPlugins` folder automatically. Do not stop to ask for approval unless an existing `Assets/GleyPlugins` folder would be overwritten.
 - Read the selected recipe before running an integration.
 - Validate after applying an integration.
 - Report changed files, validation status, and manual steps.
