@@ -15,6 +15,15 @@ namespace IntegrationAgent.Editor
         private const string LargeIconPath = "Assets/GleyPlugins/Icons/commonicon.jpg";
         private const string SmallIconPath = "Assets/GleyPlugins/Icons/smallicon.png";
         private const string NotificationsManagerPrefabPath = "Assets/GleyPlugins/Implementation/NotificationsManager.prefab";
+        private const string AutoRunRequestFileName = "gley-notifications-auto-run-request.json";
+        private const string AutoRunRunningFileName = "gley-notifications-auto-run-running.json";
+        private const string AutoRunErrorFileName = "gley-notifications-auto-run-error.json";
+
+        [InitializeOnLoadMethod]
+        private static void ConfigureWhenRequested()
+        {
+            EditorApplication.delayCall += TryRunPendingAutoConfiguration;
+        }
 
         [MenuItem("Tools/Integration Agent/Mobile Notifications/Configure Gley Notification Settings")]
         public static void ConfigureFromMenu()
@@ -34,9 +43,64 @@ namespace IntegrationAgent.Editor
             ConfigureNotificationSettings();
             var scenePath = PlaceNotificationsManagerInFirstEnabledScene();
             WriteStatusReport(scenePath);
+            ClearAutoRunMarkers();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log("Integration Agent: configured Mobile Notifications icons and first enabled scene.");
+        }
+
+        private static void TryRunPendingAutoConfiguration()
+        {
+            if (Application.isBatchMode)
+            {
+                return;
+            }
+
+            if (EditorApplication.isCompiling || EditorApplication.isUpdating)
+            {
+                EditorApplication.delayCall += TryRunPendingAutoConfiguration;
+                return;
+            }
+
+            var reportsDir = GetReportsDirectory();
+            var requestPath = Path.Combine(reportsDir, AutoRunRequestFileName);
+            if (!File.Exists(requestPath))
+            {
+                return;
+            }
+
+            var runningPath = Path.Combine(reportsDir, AutoRunRunningFileName);
+            var errorPath = Path.Combine(reportsDir, AutoRunErrorFileName);
+
+            try
+            {
+                Directory.CreateDirectory(reportsDir);
+                if (File.Exists(runningPath))
+                {
+                    File.Delete(runningPath);
+                }
+
+                File.Move(requestPath, runningPath);
+                Configure();
+
+                if (File.Exists(errorPath))
+                {
+                    File.Delete(errorPath);
+                }
+            }
+            catch (Exception exception)
+            {
+                var timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                var message = exception.ToString().Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "").Replace("\n", "\\n");
+                var json =
+                    "{\n" +
+                    "  \"configured_by\": \"IntegrationAgent.Editor.GleyNotificationUnityConfigurator\",\n" +
+                    "  \"failed_at_utc\": \"" + timestamp + "\",\n" +
+                    "  \"error\": \"" + message + "\"\n" +
+                    "}\n";
+                File.WriteAllText(errorPath, json);
+                Debug.LogException(exception);
+            }
         }
 
         private static void ConfigureNotificationSettings()
@@ -130,13 +194,7 @@ namespace IntegrationAgent.Editor
 
         private static void WriteStatusReport(string scenePath)
         {
-            var projectRoot = Directory.GetParent(Application.dataPath)?.FullName;
-            if (string.IsNullOrWhiteSpace(projectRoot))
-            {
-                throw new InvalidOperationException("Could not resolve Unity project root from Application.dataPath.");
-            }
-
-            var reportsDir = Path.Combine(projectRoot, "IntegrationAgentReports");
+            var reportsDir = GetReportsDirectory();
             Directory.CreateDirectory(reportsDir);
             var reportPath = Path.Combine(reportsDir, "gley-notifications-unity-configurator-status.json");
             var timestamp = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
@@ -151,6 +209,36 @@ namespace IntegrationAgent.Editor
                 "}\n";
             File.WriteAllText(reportPath, json);
             Debug.Log($"Integration Agent: wrote Unity configurator status report: {reportPath}");
+        }
+
+        private static void ClearAutoRunMarkers()
+        {
+            var reportsDir = GetReportsDirectory();
+            var markerPaths = new[]
+            {
+                Path.Combine(reportsDir, AutoRunRequestFileName),
+                Path.Combine(reportsDir, AutoRunRunningFileName),
+                Path.Combine(reportsDir, AutoRunErrorFileName),
+            };
+
+            foreach (var markerPath in markerPaths)
+            {
+                if (File.Exists(markerPath))
+                {
+                    File.Delete(markerPath);
+                }
+            }
+        }
+
+        private static string GetReportsDirectory()
+        {
+            var projectRoot = Directory.GetParent(Application.dataPath)?.FullName;
+            if (string.IsNullOrWhiteSpace(projectRoot))
+            {
+                throw new InvalidOperationException("Could not resolve Unity project root from Application.dataPath.");
+            }
+
+            return Path.Combine(projectRoot, "IntegrationAgentReports");
         }
     }
 }

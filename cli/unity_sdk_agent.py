@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MOBILE_NOTIFICATIONS_PACKAGE = "com.unity.mobile.notifications"
 MOBILE_NOTIFICATIONS_VERSION = "2.4.3"
 VENDORED_GLEY_PATH = ROOT / "vendor" / "gley-mobile-push-notifications" / "Assets" / "GleyPlugins"
+UNITY_CONFIGURATOR_AUTO_RUN_REQUEST = "gley-notifications-auto-run-request.json"
 
 
 class AgentError(Exception):
@@ -244,8 +245,8 @@ def validate_mobile_notifications(project: Path, profile: str = "basic") -> dict
             ),
             (
                 "unity_notification_configurator",
-                file_contains(unity_configurator, ["NotificationSettings.AndroidSettings.AddDrawableResource", "EditorSceneManager.OpenScene", "PrefabUtility.InstantiatePrefab", "WriteStatusReport", "commonicon", "smallicon"]),
-                "Unity editor configurator exists to apply Mobile Notifications icons, place NotificationsManager through Unity APIs, and write a status report."
+                file_contains(unity_configurator, ["InitializeOnLoadMethod", "NotificationSettings.AndroidSettings.AddDrawableResource", "EditorSceneManager.OpenScene", "PrefabUtility.InstantiatePrefab", "WriteStatusReport", "commonicon", "smallicon"]),
+                "Unity editor configurator exists to auto-run when requested, apply Mobile Notifications icons, place NotificationsManager through Unity APIs, and write a status report."
             ),
             (
                 "unity_configurator_executed",
@@ -278,7 +279,8 @@ def validate_mobile_notifications(project: Path, profile: str = "basic") -> dict
         "checks": checks,
         "manual_steps": [
             "Open the project in Unity so Package Manager can resolve the package.",
-            "In Unity, run Tools > Integration Agent > Mobile Notifications > Configure Gley Notification Settings so Unity applies commonicon/smallicon and places NotificationsManager in the first enabled build scene.",
+            "If Unity is already open, wait for scripts to reload so gley-notifications-auto-run-request.json is consumed automatically.",
+            "If auto-run does not create gley-notifications-unity-configurator-status.json, run Tools > Integration Agent > Mobile Notifications > Configure Gley Notification Settings.",
             "Test notification scheduling on a real Android device.",
             "This integration adds local notifications, not remote push notifications.",
             "For the gley-remote-config profile, configure Firebase Remote Config keys: isNotificationActive and notificationHours."
@@ -299,6 +301,21 @@ def write_report(project: Path, action: str, changed_files: list[str], validatio
     }
     report_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return report_path
+
+
+def write_unity_configurator_auto_run_request(project: Path, scene_path: str | None) -> Path:
+    reports_dir = project / "IntegrationAgentReports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    request_path = reports_dir / UNITY_CONFIGURATOR_AUTO_RUN_REQUEST
+    request = {
+        "requested_by": "unity_sdk_agent.py",
+        "requested_at": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"),
+        "execute_method": "IntegrationAgent.Editor.GleyNotificationUnityConfigurator.ConfigureForBatchmode",
+        "target_scene": scene_path,
+        "note": "If Unity is already open, the generated editor script auto-runs this request after scripts reload."
+    }
+    request_path.write_text(json.dumps(request, indent=2) + "\n", encoding="utf-8")
+    return request_path
 
 
 def add_mobile_notifications(project: Path, profile: str = "basic", write_report_file: bool = True) -> dict:
@@ -353,6 +370,8 @@ def configure_gley_notifications(project: Path, scene_path: str | None = None, w
         changed_files.append("Assets/Editor/IntegrationAgent/GleyNotificationUnityConfigurator.cs")
 
     configured_scene = scene_path or get_first_enabled_scene(project)
+    auto_run_request_path = write_unity_configurator_auto_run_request(project, configured_scene)
+    changed_files.append(str(auto_run_request_path.relative_to(project)).replace("\\", "/"))
 
     validation = validate_mobile_notifications(project, "gley-remote-config")
     report_path = write_report(project, "configure", changed_files, validation) if write_report_file else None
@@ -361,8 +380,9 @@ def configure_gley_notifications(project: Path, scene_path: str | None = None, w
         "changed_files": changed_files,
         "target_scene": configured_scene,
         "unity_editor_step_required": True,
+        "unity_editor_auto_run_request": str(auto_run_request_path),
         "unity_editor_execute_method": "IntegrationAgent.Editor.GleyNotificationUnityConfigurator.ConfigureForBatchmode",
-        "safety_note": "CLI does not edit .unity scene YAML or ProjectSettings/NotificationsSettings.asset directly. Unity Editor configurator must perform those changes.",
+        "safety_note": "CLI does not edit .unity scene YAML or ProjectSettings/NotificationsSettings.asset directly. If Unity is open, the generated editor script auto-runs from inside that editor after compilation; otherwise run Unity batchmode.",
         "validation": validation,
         "report_path": str(report_path) if report_path else None,
     }

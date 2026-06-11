@@ -32,9 +32,11 @@ Read the root `AGENTS.md` first. It contains the canonical workflow for mobile n
 python cli/unity_sdk_agent.py configure-gley-notifications --project "<UnityProjectPath>"
 ```
 
-4. Run Unity's editor configurator using batchmode if possible, or report the menu action as pending.
+4. If Unity is closed, run the editor configurator using batchmode. If Unity is already open, wait for the generated auto-run request to execute inside the open editor.
 5. Validate with `--profile gley-remote-config --no-report`.
 6. If validation fails, inspect the failed checks and only fix issues related to the integration.
+
+If the project is already open in Unity, do not keep retrying batchmode. The CLI writes `IntegrationAgentReports/gley-notifications-auto-run-request.json`, and the generated editor script auto-runs inside the open editor after scripts reload. Wait for `IntegrationAgentReports/gley-notifications-unity-configurator-status.json`, then validate.
 
 ## Mobile Notifications Example
 

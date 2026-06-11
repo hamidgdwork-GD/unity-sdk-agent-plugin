@@ -98,6 +98,8 @@ Tools > Integration Agent > Mobile Notifications > Configure Gley Notification S
 
 This mandatory Unity-side step uses the Mobile Notifications package editor API so the Project Settings UI displays `commonicon` and `smallicon` correctly. It also uses Unity's `EditorSceneManager` and `PrefabUtility` to place `NotificationsManager` in the first enabled build scene without corrupting the scene file, then writes `IntegrationAgentReports/gley-notifications-unity-configurator-status.json` so validation can prove the Unity step ran.
 
+If the project is already open in Unity, `configure-gley-notifications` writes `IntegrationAgentReports/gley-notifications-auto-run-request.json`. The generated editor script consumes that request after scripts reload and runs the configurator from inside the already-open editor, so a second batchmode Unity instance is not required.
+
 <p align="center">
   <img src="docs/assets/terminal-preview.svg" alt="CLI validation preview" width="86%" />
 </p>

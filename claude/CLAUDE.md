@@ -16,6 +16,8 @@ IntegrationAgent.Editor.GleyNotificationUnityConfigurator.ConfigureForBatchmode
 
 This Unity-side step configures notification icons and places `NotificationsManager` in the first enabled build scene. Do not manually edit `.unity` scene YAML or directly write `ProjectSettings/NotificationsSettings.asset`.
 
+If the project is already open in Unity, do not retry batchmode. Wait for the generated editor script to consume `IntegrationAgentReports/gley-notifications-auto-run-request.json` and create `IntegrationAgentReports/gley-notifications-unity-configurator-status.json`.
+
 Then validate:
 
 ```powershell

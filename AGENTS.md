@@ -32,6 +32,7 @@ This command is responsible for:
 - generating `Assets/Editor/IntegrationAgent/GleyNotificationUnityConfigurator.cs`
 - staging the Unity-side configurator that applies Mobile Notification settings
 - staging the Unity-side configurator that places `NotificationsManager` in the first enabled build scene
+- writing `IntegrationAgentReports/gley-notifications-auto-run-request.json` so an already-open Unity editor can auto-run the configurator after scripts reload
 - writing a validation report
 
 Safety rule: the CLI must not directly edit `.unity` scene YAML and must not directly write `ProjectSettings/NotificationsSettings.asset`. Those files are Unity-owned and must be changed by the generated Unity Editor configurator.
@@ -50,7 +51,9 @@ Preferred if Unity executable is available:
 "<Unity.exe>" -batchmode -quit -projectPath "<UnityProjectPath>" -executeMethod IntegrationAgent.Editor.GleyNotificationUnityConfigurator.ConfigureForBatchmode
 ```
 
-If the agent cannot run Unity batchmode, it must clearly report this remaining user action:
+If the project is already open in Unity, do not retry batchmode. Wait for Unity to compile the generated editor script; the script has an `InitializeOnLoadMethod` that consumes `IntegrationAgentReports/gley-notifications-auto-run-request.json` and runs the configurator from inside the open editor.
+
+If auto-run does not create `IntegrationAgentReports/gley-notifications-unity-configurator-status.json`, then clearly report this fallback user action:
 
 ```text
 Open Unity and run:
@@ -80,4 +83,5 @@ The integration is also incomplete if `unity_configurator_executed` fails, becau
 - Do not manually append prefab YAML to `.unity` scene files. This can corrupt the startup/splash scene.
 - Do not overwrite an existing `Assets/GleyPlugins` with `--force` unless the user explicitly approves.
 - Do not ask for approval just because `Assets/GleyPlugins` is missing. The owner-approved bundled Gley copy is part of the production setup and should be installed automatically by `configure-gley-notifications`.
+- Do not repeatedly launch Unity batchmode when the same project is already open in Unity. Let the auto-run request execute in the open editor.
 - Do not claim the integration is complete until validation passes and the Unity-side icon configurator has been executed or explicitly reported as pending.

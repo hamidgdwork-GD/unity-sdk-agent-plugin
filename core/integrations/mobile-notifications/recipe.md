@@ -138,6 +138,14 @@ Or run Unity in batchmode with:
 
 This step is required because Unity's Mobile Notifications Project Settings panel is controlled by package editor code, and direct JSON edits can be ignored by the UI in some projects. The same step places `NotificationsManager` using `EditorSceneManager` and `PrefabUtility`, which avoids scene corruption from manual YAML edits.
 
+If the project is already open in Unity, do not launch a second Unity batchmode process for the same project. `configure-gley-notifications` writes:
+
+```text
+IntegrationAgentReports/gley-notifications-auto-run-request.json
+```
+
+The generated Unity editor script consumes this request with `InitializeOnLoadMethod` after scripts reload and runs the configurator from inside the already-open editor.
+
 On success, the Unity configurator writes:
 
 ```text
